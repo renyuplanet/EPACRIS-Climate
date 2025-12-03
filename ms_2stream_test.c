@@ -17,6 +17,8 @@
 #include <math.h>
 #include "constant.h"
 
+void pexit(void) {printf("\n%s\n","=========================\n==== EXITING PROGRAM ====\n=========================\n");}
+
 //=========================================================
 //=== Function identifiers=================================
 void ms_two_str_solver(int lbin, double w[], double g[], double tau[], int nrl, int isconv[], double **Tvar, int jTvar, double P[], double **NetFlux, double Fup[], double Fdn[], double Fcup[], double Fcdn[], double Tint);
@@ -85,7 +87,7 @@ void ms_two_str_solver(int lbin, double w[], double g[], double tau[], int nrl, 
     tauC[0] = 0.0;  //initializing 'TOA'
     for (i=1;i<=2*zbin;i++)   //Layloop (through layers)
     {
-        if(wdoub[i] >= 1.0) printf("%s %d\n", "WARNING: w[",i,"] >= 1.0 at lambda: ", wavelength[lbin]); //template
+        if(wdoub[i] >= 1.0) printf("WARNING: w[%d] >= 1.0 at lambda: %f\n", i, wavelength[lbin]); //template
     //E-factor (Eq.31)
         E[i] = 1.225 - 0.1582*gdoub[i] - 0.1777*wdoub[i] - 0.07465*gdoub[i]*gdoub[i] + 0.2351*wdoub[i]*gdoub[i] - 0.05582*wdoub[i]*wdoub[i];
         //E[i] = 1.0; //testing

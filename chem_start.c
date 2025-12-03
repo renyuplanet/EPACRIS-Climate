@@ -50,7 +50,7 @@ void chem_start(int **a_ij, double *b_j, double *y)
           /* printf("%s %d %d %d\n", "a_ij_new", i, j, a_ij[i][j]);*/
       }
     
-      printf("%s %d %d\n", "sum", j, sum[j]);
+      //printf("%s %d %d\n", "sum", j, sum[j]);
       
 	  if (j == 0) { 
 		  small = b_j[0]/sum[0];
@@ -65,7 +65,7 @@ void chem_start(int **a_ij, double *b_j, double *y)
         y[i] = small;
     }
     
-    printf("%s %e\n", "small", small);
+    //printf("%s %e\n", "small", small);
   
   for (j=0; j<NATOMS; j++){
     b_test[j] = 0.0;

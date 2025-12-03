@@ -15,7 +15,7 @@ void printout_std_t(double z[], char outstdt[])
 		fprintf(fp, "%f\t%f\t", z[j-1], z[j]);
 		fprintf(fp, "%f\t%e\t", tl[j], pl[j]);
 		for (i=1; i<=NSP; i++) {
-			fprintf(fp, "%e\t", xx[j][i]);
+			fprintf(fp, "%e\t", xx[j][i]/MM[j]);
 		}
 		fprintf(fp, "\n");
 	}

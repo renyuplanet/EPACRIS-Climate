@@ -45,7 +45,7 @@ void chem_equil(double P, double *g0, int **a_ij, double *b_j, double *y)
   FILE *file;
 
   count = 0;
-  max_count = 20000;
+  max_count = 100000;
   tiny = 1.0e-90;
   P *= 1.0/ATM_TO_PA;
 

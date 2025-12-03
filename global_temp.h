@@ -7,6 +7,7 @@ Last modified: July 20, 2011
 
 #ifndef __GLOBAL_H__
 #define __GLOBAL_H__
+#include "config.h"
 
 /*---- External Variables ------------------------------------------- */
 
@@ -39,9 +40,50 @@ extern int    ReactionR[NKin+1][7], ReactionM[NKinM+1][5], ReactionP[NPho+1][9],
 extern int    numx, numc, numf, numa, waternum, waterx, numr, numm, numt, nump;
 extern double xx[zbin+1][NSP+1];
 extern double mkv[], Tnew[], Pnew[];
+extern double clouds[zbin+1][NSP+1]; // Cloud abundances for condensible species (number density) molecules cm^-3
+
+// Photochemistry arrays (PhotoCross)
+extern double **cross, **crosst;  // PhotoCross cross sections
+extern int *stdcross;             // PhotoCross species indices
+extern double *qysum;              // PhotoCross quantum yields
+
+// Cloud optical property arrays for radiative transfer [layer][wavelength]
+extern double **cH2O, **aH2O, **gH2O;  // H2O cloud: cross-section (cm^-1), albedo, asymmetry g
+extern double **cNH3, **aNH3, **gNH3;  // NH3 cloud: cross-section (cm^-1), albedo, asymmetry g
 extern double H2H2CIA[zbin+1][NLAMBDA], H2HeCIA[zbin+1][NLAMBDA], H2HCIA[zbin+1][NLAMBDA], N2H2CIA[zbin+1][NLAMBDA], N2N2CIA[zbin+1][NLAMBDA], CO2CO2CIA[zbin+1][NLAMBDA];
 extern double MeanH2H2CIA[], MeanH2HeCIA[], MeanH2HCIA[], MeanN2H2CIA[], MeanN2N2CIA[],MeanCO2CO2CIA[];
 extern double SMeanH2H2CIA[], SMeanH2HeCIA[], SMeanH2HCIA[], SMeanN2H2CIA[], SMeanN2N2CIA[], SMeanCO2CO2CIA[];
+
+// Dynamic condensibles management variables
+extern int NCONDENSIBLES;
+extern int CONDENSIBLES[];
+// ALPHA_RAINOUT is now a single constant defined in AlphaAb.h
+
+// Additional global variables
+extern double Tdoub[];
+extern double TAUdoub[];  // Double grid optical depth
+extern double Pdoub[];    // Double grid pressure
+extern double MMdoub[];   // Double grid number density
+extern double zdoub[];    // Double grid altitude
+extern double rt_drfluxmax_init; // Initial radiative flux maximum
+
+extern int RTstepcount;
+extern double GA; // Gravitational acceleration
+
+// Enhanced cloud physics arrays
+extern double particle_r2[zbin+1][MAX_CONDENSIBLES];
+extern double particle_r0[zbin+1][MAX_CONDENSIBLES];  // Mode radius (nucleation/monomer radius) [μm]
+extern double particle_VP[zbin+1][MAX_CONDENSIBLES];  // Particle volume [cm³]
+extern double particle_mass[zbin+1][MAX_CONDENSIBLES];  // Particle mass [kg]
+extern double particle_number_density[zbin+1][MAX_CONDENSIBLES]; // Particle number density [particles/m³]
+extern double fall_velocity_ms[zbin+1][MAX_CONDENSIBLES];
+extern double cloud_retention[zbin+1][MAX_CONDENSIBLES];
+
+// NOTE: Function declarations have been moved to module-specific headers:
+// - Convection/condensation/cloud physics: conv_cond_funcs.h
+// - Opacity reading/reinterpolation: readcross.h
+// - CIA opacity: readcia.h
+// - Cloud optical properties: cloud_optics.h
 
 #endif /* !__GLOBAL_H__ */
 

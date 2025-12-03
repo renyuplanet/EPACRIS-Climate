@@ -18,6 +18,7 @@ Based on methods of White, Johnson & Dantzig 1958; and code of Eliza Miller-Ricc
 #include "nrutil.h"
 #include "chem_start.c"
 #include "chem_equil.c"
+#include "config.h"
 
 /* --- Global variables ------------------------------------------ */
 
@@ -51,14 +52,18 @@ void chemquil(double P[], double T[], int NL, int species[], int NS, double **mi
   b_j = dvector(0, NATOMS-1);
   id = ivector(0, NMOLECULES-1);
 
-/* Read in relative abundances of each element */
+  /* Read in relative abundances of each element */
 
   file = fopen(atomfile, "r");  
   for(j=0; j<NATOMS; j++){
     fscanf(file, "%d %s", &dum, atom[j]);
     fscanf(file, "%le\n", &b_j[j]);
   }
-  fclose(file);  
+  fclose(file);
+  
+  // DEBUG: Print Fe abundance
+  //printf("DEBUG: Fe abundance from file: %e (atom index %d)\n", b_j[20], 20);
+  //printf("DEBUG: Fe abundance from file: %e (atom index %d)\n", b_j[21], 21);  
   for (j=0; j<NATOMS; j++){
     if (b_j[j] < 1.0e-20)
       b_j[j] = 1.0e-20;
@@ -81,19 +86,23 @@ void chemquil(double P[], double T[], int NL, int species[], int NS, double **mi
              d[i], e[i]);*/
       for (j=0; j<NATOMS; j++){
           fscanf(file, "%d", &a_ij[i][j]);
-          /*printf("%s %d %d %d\n", "a_ij", i, j, a_ij[i][j]);*/
+          /*printf("%s %d %d %d %d\n", "a_ij", i, j, a_ij[i][j]);*/
       }
+      
+
   }
     
   fclose(file);
 
-/* Chemical equilibrium calculation and return results*/
+  /* Chemical equilibrium calculation and return results*/
 
   /* Initial solution */
 
   chem_start(a_ij, b_j, y_start);
+  
+
 	
-	printf("%s\n","start chemequil");
+	//printf("%s\n","start chemequil");
 
   /* Loop over P-T */
 
@@ -121,12 +130,14 @@ void chemquil(double P[], double T[], int NL, int species[], int NS, double **mi
 		  ysave[l][i] = y[i]/norm; 
 		  /* printf("E %lf %lf %d %e\n", P[l], T[l], i, ysave[l][i]); */
 	  }
+      
+
 
   }
 	
-	printf("%s\n","finish looping");
+	//printf("%s\n","*** Chemical equilibrium achieved ***");
   
-  	/* Return the requested mixing ratios */
+  	  /* Return the requested mixing ratios */
  
       for (i=0; i<NMOLECULES; i++){
           k=0;
@@ -135,13 +146,15 @@ void chemquil(double P[], double T[], int NL, int species[], int NS, double **mi
 		  }
           if (k!=0) {
 			  for (l=1; l<NL; l++) {mixequil[l][k]=ysave[l][i];}
+              
+
           } else {
 			  for (l=1; l<NL; l++) {mixequil[l][k] = 0.0;}
 		  }
 
       }
 	
-	printf("%s\n","finish looping");
+	//printf("%s\n","*** Chemical equilibrium achieved ***");
 
 /* Clean up */
   

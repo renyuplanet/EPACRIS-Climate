@@ -1,0 +1,3 @@
+
+add_library(photochem_wrapper photochem_c_api.f90)
+target_link_libraries(photochem_wrapper photochem)

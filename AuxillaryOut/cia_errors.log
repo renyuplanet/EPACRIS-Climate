@@ -1,0 +1,490 @@
+[2025-05-15 12:19:38] H2-H2 CIA file has 19991 lines of data
+[2025-05-15 12:20:26] Checksums calculated - H2-H2: 1.875697e-42 (nonzero: 0, max: 4.773744e-45)
+[2025-05-15 12:20:26] Checksums calculated - H2-He: 1.007669e-42 (nonzero: 0, max: 1.422837e-45)
+[2025-05-15 12:20:27] H2-H2 match: YES (1.87569680e-42 vs 1.87569680e-42)
+[2025-05-15 12:20:27] H2-He match: YES (1.00766923e-42 vs 1.00766923e-42)
+[2025-05-15 12:20:27] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 12:20:27] N2-N2 match: YES (2.11919040e-42 vs 2.11919040e-42)
+[2025-05-15 12:20:27] N2-H2 match: YES (4.67047625e-42 vs 4.67047625e-42)
+[2025-05-15 12:20:27] CO2-CO2 match: YES (2.35502660e-41 vs 2.35502660e-41)
+[2025-05-15 12:20:27] CIA verification complete: All matches OK
+[2025-05-15 12:20:27] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 12:31:30] H2-H2 CIA file has 19991 lines of data
+[2025-05-15 12:32:18] Checksums calculated - H2-H2: 1.875697e-42 (nonzero: 0, max: 4.773744e-45)
+[2025-05-15 12:32:18] Checksums calculated - H2-He: 1.007669e-42 (nonzero: 0, max: 1.422837e-45)
+[2025-05-15 12:32:19] H2-H2 match: YES (1.87569680e-42 vs 1.87569680e-42)
+[2025-05-15 12:32:19] H2-He match: YES (1.00766923e-42 vs 1.00766923e-42)
+[2025-05-15 12:32:19] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 12:32:19] N2-N2 match: YES (2.11919040e-42 vs 2.11919040e-42)
+[2025-05-15 12:32:19] N2-H2 match: YES (4.67047625e-42 vs 4.67047625e-42)
+[2025-05-15 12:32:19] CO2-CO2 match: YES (2.35502660e-41 vs 2.35502660e-41)
+[2025-05-15 12:32:19] CIA verification complete: All matches OK
+[2025-05-15 12:32:19] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 13:19:20] H2-H2 CIA file has 19991 lines of data
+[2025-05-15 13:20:09] Checksums calculated - H2-H2: 1.875697e-42 (nonzero: 0, max: 4.773744e-45)
+[2025-05-15 13:20:09] Checksums calculated - H2-He: 1.007669e-42 (nonzero: 0, max: 1.422837e-45)
+[2025-05-15 13:29:31] H2-H2 match: YES (1.87569680e-42 vs 1.97386529e-42)
+[2025-05-15 13:29:31] H2-He match: YES (1.00766923e-42 vs 1.18911552e-42)
+[2025-05-15 13:29:31] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 13:29:31] N2-N2 match: YES (2.11919040e-42 vs 2.21274177e-42)
+[2025-05-15 13:29:31] N2-H2 match: YES (4.67047625e-42 vs 4.92988634e-42)
+[2025-05-15 13:29:31] CO2-CO2 match: YES (2.35502660e-41 vs 2.27996143e-41)
+[2025-05-15 13:29:31] CIA verification complete: All matches OK
+[2025-05-15 13:29:31] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 14:35:49] H2-H2 CIA file has 19991 lines of data
+[2025-05-15 14:36:36] Checksums calculated - H2-H2: 1.875697e-42 (nonzero: 0, max: 4.773744e-45)
+[2025-05-15 14:36:36] Checksums calculated - H2-He: 1.007669e-42 (nonzero: 0, max: 1.422837e-45)
+[2025-05-15 14:45:52] H2-H2 match: YES (1.87569680e-42 vs 1.97386529e-42)
+[2025-05-15 14:45:52] H2-He match: YES (1.00766923e-42 vs 1.18911552e-42)
+[2025-05-15 14:45:52] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 14:45:52] N2-N2 match: YES (2.11919040e-42 vs 2.21274177e-42)
+[2025-05-15 14:45:52] N2-H2 match: YES (4.67047625e-42 vs 4.92988634e-42)
+[2025-05-15 14:45:52] CO2-CO2 match: YES (2.35502660e-41 vs 2.27996143e-41)
+[2025-05-15 14:45:52] CIA verification complete: All matches OK
+[2025-05-15 14:45:52] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:05:59] H2-H2 CIA file has 19991 lines of data
+[2025-05-15 15:06:48] Checksums calculated - H2-H2: 1.875697e-42 (nonzero: 0, max: 4.773744e-45)
+[2025-05-15 15:06:48] Checksums calculated - H2-He: 1.007669e-42 (nonzero: 0, max: 1.422837e-45)
+[2025-05-15 15:08:58] H2-H2 match: YES (1.87569680e-42 vs 1.87569680e-42)
+[2025-05-15 15:08:58] H2-He match: YES (1.00766923e-42 vs 1.00766923e-42)
+[2025-05-15 15:08:58] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:08:58] N2-N2 match: YES (2.11919040e-42 vs 2.11919040e-42)
+[2025-05-15 15:08:58] N2-H2 match: YES (4.67047625e-42 vs 4.67047625e-42)
+[2025-05-15 15:08:58] CO2-CO2 match: YES (2.35502660e-41 vs 2.35502660e-41)
+[2025-05-15 15:08:58] CIA verification complete: All matches OK
+[2025-05-15 15:08:58] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:01] H2-H2 match: YES (1.87569680e-42 vs 1.86869451e-42)
+[2025-05-15 15:09:01] H2-He match: YES (1.00766923e-42 vs 9.99673168e-43)
+[2025-05-15 15:09:01] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:01] N2-N2 match: YES (2.11919040e-42 vs 2.12548640e-42)
+[2025-05-15 15:09:01] N2-H2 match: YES (4.67047625e-42 vs 4.66406249e-42)
+[2025-05-15 15:09:01] CO2-CO2 match: YES (2.35502660e-41 vs 2.37680017e-41)
+[2025-05-15 15:09:01] CIA verification complete: All matches OK
+[2025-05-15 15:09:01] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:04] H2-H2 match: YES (1.87569680e-42 vs 1.86383965e-42)
+[2025-05-15 15:09:04] H2-He match: YES (1.00766923e-42 vs 9.94129309e-43)
+[2025-05-15 15:09:04] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:04] N2-N2 match: YES (2.11919040e-42 vs 2.12985157e-42)
+[2025-05-15 15:09:04] N2-H2 match: YES (4.67047625e-42 vs 4.65961567e-42)
+[2025-05-15 15:09:04] CO2-CO2 match: YES (2.35502660e-41 vs 2.39189630e-41)
+[2025-05-15 15:09:04] CIA verification complete: All matches OK
+[2025-05-15 15:09:04] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:07] H2-H2 match: YES (1.87569680e-42 vs 1.85897432e-42)
+[2025-05-15 15:09:07] H2-He match: YES (1.00766923e-42 vs 9.88573487e-43)
+[2025-05-15 15:09:07] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:07] N2-N2 match: YES (2.11919040e-42 vs 2.13422616e-42)
+[2025-05-15 15:09:07] N2-H2 match: YES (4.67047625e-42 vs 4.65515926e-42)
+[2025-05-15 15:09:07] CO2-CO2 match: YES (2.35502660e-41 vs 2.40702501e-41)
+[2025-05-15 15:09:07] CIA verification complete: All matches OK
+[2025-05-15 15:09:07] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:10] H2-H2 match: YES (1.87569680e-42 vs 1.85415329e-42)
+[2025-05-15 15:09:10] H2-He match: YES (1.00766923e-42 vs 9.83068250e-43)
+[2025-05-15 15:09:10] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:10] N2-N2 match: YES (2.11919040e-42 vs 2.13856092e-42)
+[2025-05-15 15:09:10] N2-H2 match: YES (4.67047625e-42 vs 4.65074343e-42)
+[2025-05-15 15:09:10] CO2-CO2 match: YES (2.35502660e-41 vs 2.42201597e-41)
+[2025-05-15 15:09:10] CIA verification complete: All matches OK
+[2025-05-15 15:09:10] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:13] H2-H2 match: YES (1.87569680e-42 vs 1.85022959e-42)
+[2025-05-15 15:09:13] H2-He match: YES (1.00766923e-42 vs 9.78587692e-43)
+[2025-05-15 15:09:13] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:13] N2-N2 match: YES (2.11919040e-42 vs 2.14257416e-42)
+[2025-05-15 15:09:13] N2-H2 match: YES (4.67047625e-42 vs 4.64818271e-42)
+[2025-05-15 15:09:13] CO2-CO2 match: YES (2.35502660e-41 vs 2.43421669e-41)
+[2025-05-15 15:09:13] CIA verification complete: All matches OK
+[2025-05-15 15:09:13] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:17] H2-H2 match: YES (1.87569680e-42 vs 1.84825876e-42)
+[2025-05-15 15:09:17] H2-He match: YES (1.00766923e-42 vs 9.76337155e-43)
+[2025-05-15 15:09:17] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:17] N2-N2 match: YES (2.11919040e-42 vs 2.14584755e-42)
+[2025-05-15 15:09:17] N2-H2 match: YES (4.67047625e-42 vs 4.64957383e-42)
+[2025-05-15 15:09:17] CO2-CO2 match: YES (2.35502660e-41 vs 2.44034499e-41)
+[2025-05-15 15:09:17] CIA verification complete: All matches OK
+[2025-05-15 15:09:17] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:20] H2-H2 match: YES (1.87569680e-42 vs 1.84702868e-42)
+[2025-05-15 15:09:20] H2-He match: YES (1.00766923e-42 vs 9.74932504e-43)
+[2025-05-15 15:09:20] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:20] N2-N2 match: YES (2.11919040e-42 vs 2.14890887e-42)
+[2025-05-15 15:09:20] N2-H2 match: YES (4.67047625e-42 vs 4.65260996e-42)
+[2025-05-15 15:09:20] CO2-CO2 match: YES (2.35502660e-41 vs 2.44416990e-41)
+[2025-05-15 15:09:20] CIA verification complete: All matches OK
+[2025-05-15 15:09:20] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:23] H2-H2 match: YES (1.87569680e-42 vs 1.84633658e-42)
+[2025-05-15 15:09:23] H2-He match: YES (1.00766923e-42 vs 9.74142178e-43)
+[2025-05-15 15:09:23] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:23] N2-N2 match: YES (2.11919040e-42 vs 2.15172920e-42)
+[2025-05-15 15:09:23] N2-H2 match: YES (4.67047625e-42 vs 4.65665559e-42)
+[2025-05-15 15:09:23] CO2-CO2 match: YES (2.35502660e-41 vs 2.44632199e-41)
+[2025-05-15 15:09:23] CIA verification complete: All matches OK
+[2025-05-15 15:09:23] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:26] H2-H2 match: YES (1.87569680e-42 vs 1.84610362e-42)
+[2025-05-15 15:09:26] H2-He match: YES (1.00766923e-42 vs 9.73876157e-43)
+[2025-05-15 15:09:26] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:26] N2-N2 match: YES (2.11919040e-42 vs 2.15440269e-42)
+[2025-05-15 15:09:26] N2-H2 match: YES (4.67047625e-42 vs 4.66168806e-42)
+[2025-05-15 15:09:26] CO2-CO2 match: YES (2.35502660e-41 vs 2.44704637e-41)
+[2025-05-15 15:09:26] CIA verification complete: All matches OK
+[2025-05-15 15:09:26] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:30] H2-H2 match: YES (1.87569680e-42 vs 1.84634396e-42)
+[2025-05-15 15:09:30] H2-He match: YES (1.00766923e-42 vs 9.74150613e-43)
+[2025-05-15 15:09:30] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:30] N2-N2 match: YES (2.11919040e-42 vs 2.15699788e-42)
+[2025-05-15 15:09:30] N2-H2 match: YES (4.67047625e-42 vs 4.66789338e-42)
+[2025-05-15 15:09:30] CO2-CO2 match: YES (2.35502660e-41 vs 2.44629902e-41)
+[2025-05-15 15:09:30] CIA verification complete: All matches OK
+[2025-05-15 15:09:30] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:33] H2-H2 match: YES (1.87569680e-42 vs 1.84722588e-42)
+[2025-05-15 15:09:33] H2-He match: YES (1.00766923e-42 vs 9.75157696e-43)
+[2025-05-15 15:09:33] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:33] N2-N2 match: YES (2.11919040e-42 vs 2.15944943e-42)
+[2025-05-15 15:09:33] N2-H2 match: YES (4.67047625e-42 vs 4.67560866e-42)
+[2025-05-15 15:09:33] CO2-CO2 match: YES (2.35502660e-41 vs 2.44355670e-41)
+[2025-05-15 15:09:33] CIA verification complete: All matches OK
+[2025-05-15 15:09:33] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:36] H2-H2 match: YES (1.87569680e-42 vs 1.84808602e-42)
+[2025-05-15 15:09:36] H2-He match: YES (1.00766923e-42 vs 9.76139909e-43)
+[2025-05-15 15:09:36] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:36] N2-N2 match: YES (2.11919040e-42 vs 2.16201435e-42)
+[2025-05-15 15:09:36] N2-H2 match: YES (4.67047625e-42 vs 4.68350365e-42)
+[2025-05-15 15:09:36] CO2-CO2 match: YES (2.35502660e-41 vs 2.44088209e-41)
+[2025-05-15 15:09:36] CIA verification complete: All matches OK
+[2025-05-15 15:09:36] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:39] H2-H2 match: YES (1.87569680e-42 vs 1.84899864e-42)
+[2025-05-15 15:09:39] H2-He match: YES (1.00766923e-42 vs 9.77182049e-43)
+[2025-05-15 15:09:39] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:39] N2-N2 match: YES (2.11919040e-42 vs 2.16459078e-42)
+[2025-05-15 15:09:39] N2-H2 match: YES (4.67047625e-42 vs 4.69157170e-42)
+[2025-05-15 15:09:39] CO2-CO2 match: YES (2.35502660e-41 vs 2.43804431e-41)
+[2025-05-15 15:09:39] CIA verification complete: All matches OK
+[2025-05-15 15:09:39] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:42] H2-H2 match: YES (1.87569680e-42 vs 1.84999899e-42)
+[2025-05-15 15:09:42] H2-He match: YES (1.00766923e-42 vs 9.78324362e-43)
+[2025-05-15 15:09:42] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:42] N2-N2 match: YES (2.11919040e-42 vs 2.16716093e-42)
+[2025-05-15 15:09:42] N2-H2 match: YES (4.67047625e-42 vs 4.69987465e-42)
+[2025-05-15 15:09:42] CO2-CO2 match: YES (2.35502660e-41 vs 2.43493375e-41)
+[2025-05-15 15:09:42] CIA verification complete: All matches OK
+[2025-05-15 15:09:42] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:45] H2-H2 match: YES (1.87569680e-42 vs 1.85110359e-42)
+[2025-05-15 15:09:45] H2-He match: YES (1.00766923e-42 vs 9.79585727e-43)
+[2025-05-15 15:09:45] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:45] N2-N2 match: YES (2.11919040e-42 vs 2.16971454e-42)
+[2025-05-15 15:09:45] N2-H2 match: YES (4.67047625e-42 vs 4.70843742e-42)
+[2025-05-15 15:09:45] CO2-CO2 match: YES (2.35502660e-41 vs 2.43149901e-41)
+[2025-05-15 15:09:45] CIA verification complete: All matches OK
+[2025-05-15 15:09:45] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:49] H2-H2 match: YES (1.87569680e-42 vs 1.85240801e-42)
+[2025-05-15 15:09:49] H2-He match: YES (1.00766923e-42 vs 9.81075271e-43)
+[2025-05-15 15:09:49] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:49] N2-N2 match: YES (2.11919040e-42 vs 2.17215264e-42)
+[2025-05-15 15:09:49] N2-H2 match: YES (4.67047625e-42 vs 4.71731984e-42)
+[2025-05-15 15:09:49] CO2-CO2 match: YES (2.35502660e-41 vs 2.42744292e-41)
+[2025-05-15 15:09:49] CIA verification complete: All matches OK
+[2025-05-15 15:09:49] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:52] H2-H2 match: YES (1.87569680e-42 vs 1.85370670e-42)
+[2025-05-15 15:09:52] H2-He match: YES (1.00766923e-42 vs 9.82558275e-43)
+[2025-05-15 15:09:52] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:52] N2-N2 match: YES (2.11919040e-42 vs 2.17460598e-42)
+[2025-05-15 15:09:52] N2-H2 match: YES (4.67047625e-42 vs 4.72621846e-42)
+[2025-05-15 15:09:52] CO2-CO2 match: YES (2.35502660e-41 vs 2.42340465e-41)
+[2025-05-15 15:09:52] CIA verification complete: All matches OK
+[2025-05-15 15:09:52] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:55] H2-H2 match: YES (1.87569680e-42 vs 1.85499617e-42)
+[2025-05-15 15:09:55] H2-He match: YES (1.00766923e-42 vs 9.84030744e-43)
+[2025-05-15 15:09:55] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:55] N2-N2 match: YES (2.11919040e-42 vs 2.17706455e-42)
+[2025-05-15 15:09:55] N2-H2 match: YES (4.67047625e-42 vs 4.73510213e-42)
+[2025-05-15 15:09:55] CO2-CO2 match: YES (2.35502660e-41 vs 2.41939506e-41)
+[2025-05-15 15:09:55] CIA verification complete: All matches OK
+[2025-05-15 15:09:55] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:09:58] H2-H2 match: YES (1.87569680e-42 vs 1.85627557e-42)
+[2025-05-15 15:09:58] H2-He match: YES (1.00766923e-42 vs 9.85491725e-43)
+[2025-05-15 15:09:58] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:09:58] N2-N2 match: YES (2.11919040e-42 vs 2.17930186e-42)
+[2025-05-15 15:09:58] N2-H2 match: YES (4.67047625e-42 vs 4.74348626e-42)
+[2025-05-15 15:09:58] CO2-CO2 match: YES (2.35502660e-41 vs 2.41541676e-41)
+[2025-05-15 15:09:58] CIA verification complete: All matches OK
+[2025-05-15 15:09:58] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:01] H2-H2 match: YES (1.87569680e-42 vs 1.85754452e-42)
+[2025-05-15 15:10:01] H2-He match: YES (1.00766923e-42 vs 9.86940768e-43)
+[2025-05-15 15:10:01] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:01] N2-N2 match: YES (2.11919040e-42 vs 2.18120779e-42)
+[2025-05-15 15:10:01] N2-H2 match: YES (4.67047625e-42 vs 4.75113531e-42)
+[2025-05-15 15:10:01] CO2-CO2 match: YES (2.35502660e-41 vs 2.41147096e-41)
+[2025-05-15 15:10:01] CIA verification complete: All matches OK
+[2025-05-15 15:10:01] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:05] H2-H2 match: YES (1.87569680e-42 vs 1.85880285e-42)
+[2025-05-15 15:10:05] H2-He match: YES (1.00766923e-42 vs 9.88377673e-43)
+[2025-05-15 15:10:05] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:05] N2-N2 match: YES (2.11919040e-42 vs 2.18315456e-42)
+[2025-05-15 15:10:05] N2-H2 match: YES (4.67047625e-42 vs 4.75884123e-42)
+[2025-05-15 15:10:05] CO2-CO2 match: YES (2.35502660e-41 vs 2.40755822e-41)
+[2025-05-15 15:10:05] CIA verification complete: All matches OK
+[2025-05-15 15:10:05] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:08] H2-H2 match: YES (1.87569680e-42 vs 1.86017456e-42)
+[2025-05-15 15:10:08] H2-He match: YES (1.00766923e-42 vs 9.89944064e-43)
+[2025-05-15 15:10:08] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:08] N2-N2 match: YES (2.11919040e-42 vs 2.18512419e-42)
+[2025-05-15 15:10:08] N2-H2 match: YES (4.67047625e-42 vs 4.76691673e-42)
+[2025-05-15 15:10:08] CO2-CO2 match: YES (2.35502660e-41 vs 2.40329288e-41)
+[2025-05-15 15:10:08] CIA verification complete: All matches OK
+[2025-05-15 15:10:08] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:11] H2-H2 match: YES (1.87569680e-42 vs 1.86153333e-42)
+[2025-05-15 15:10:11] H2-He match: YES (1.00766923e-42 vs 9.91495675e-43)
+[2025-05-15 15:10:11] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:11] N2-N2 match: YES (2.11919040e-42 vs 2.18713744e-42)
+[2025-05-15 15:10:11] N2-H2 match: YES (4.67047625e-42 vs 4.77504846e-42)
+[2025-05-15 15:10:11] CO2-CO2 match: YES (2.35502660e-41 vs 2.39906778e-41)
+[2025-05-15 15:10:11] CIA verification complete: All matches OK
+[2025-05-15 15:10:11] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:14] H2-H2 match: YES (1.87569680e-42 vs 1.86287921e-42)
+[2025-05-15 15:10:14] H2-He match: YES (1.00766923e-42 vs 9.93032561e-43)
+[2025-05-15 15:10:14] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:14] N2-N2 match: YES (2.11919040e-42 vs 2.18898230e-42)
+[2025-05-15 15:10:14] N2-H2 match: YES (4.67047625e-42 vs 4.78278520e-42)
+[2025-05-15 15:10:14] CO2-CO2 match: YES (2.35502660e-41 vs 2.39488279e-41)
+[2025-05-15 15:10:14] CIA verification complete: All matches OK
+[2025-05-15 15:10:14] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:17] H2-H2 match: YES (1.87569680e-42 vs 1.86419871e-42)
+[2025-05-15 15:10:17] H2-He match: YES (1.00766923e-42 vs 9.94587781e-43)
+[2025-05-15 15:10:17] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:17] N2-N2 match: YES (2.11919040e-42 vs 2.19098609e-42)
+[2025-05-15 15:10:17] N2-H2 match: YES (4.67047625e-42 vs 4.79074147e-42)
+[2025-05-15 15:10:17] CO2-CO2 match: YES (2.35502660e-41 vs 2.39083693e-41)
+[2025-05-15 15:10:17] CIA verification complete: All matches OK
+[2025-05-15 15:10:17] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:20] H2-H2 match: YES (1.87569680e-42 vs 1.86543977e-42)
+[2025-05-15 15:10:20] H2-He match: YES (1.00766923e-42 vs 9.96288576e-43)
+[2025-05-15 15:10:20] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:20] N2-N2 match: YES (2.11919040e-42 vs 2.19305232e-42)
+[2025-05-15 15:10:20] N2-H2 match: YES (4.67047625e-42 vs 4.79839440e-42)
+[2025-05-15 15:10:20] CO2-CO2 match: YES (2.35502660e-41 vs 2.38731199e-41)
+[2025-05-15 15:10:20] CIA verification complete: All matches OK
+[2025-05-15 15:10:20] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:24] H2-H2 match: YES (1.87569680e-42 vs 1.86664149e-42)
+[2025-05-15 15:10:24] H2-He match: YES (1.00766923e-42 vs 9.98040032e-43)
+[2025-05-15 15:10:24] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:24] N2-N2 match: YES (2.11919040e-42 vs 2.19532447e-42)
+[2025-05-15 15:10:24] N2-H2 match: YES (4.67047625e-42 vs 4.80628722e-42)
+[2025-05-15 15:10:24] CO2-CO2 match: YES (2.35502660e-41 vs 2.38402206e-41)
+[2025-05-15 15:10:24] CIA verification complete: All matches OK
+[2025-05-15 15:10:24] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:27] H2-H2 match: YES (1.87569680e-42 vs 1.86780647e-42)
+[2025-05-15 15:10:27] H2-He match: YES (1.00766923e-42 vs 9.99836381e-43)
+[2025-05-15 15:10:27] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:27] N2-N2 match: YES (2.11919040e-42 vs 2.19748316e-42)
+[2025-05-15 15:10:27] N2-H2 match: YES (4.67047625e-42 vs 4.81375540e-42)
+[2025-05-15 15:10:27] CO2-CO2 match: YES (2.35502660e-41 vs 2.38094866e-41)
+[2025-05-15 15:10:27] CIA verification complete: All matches OK
+[2025-05-15 15:10:27] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:30] H2-H2 match: YES (1.87569680e-42 vs 1.86894255e-42)
+[2025-05-15 15:10:30] H2-He match: YES (1.00766923e-42 vs 1.00165893e-42)
+[2025-05-15 15:10:30] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:30] N2-N2 match: YES (2.11919040e-42 vs 2.19991662e-42)
+[2025-05-15 15:10:30] N2-H2 match: YES (4.67047625e-42 vs 4.82167283e-42)
+[2025-05-15 15:10:30] CO2-CO2 match: YES (2.35502660e-41 vs 2.37803488e-41)
+[2025-05-15 15:10:30] CIA verification complete: All matches OK
+[2025-05-15 15:10:30] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:33] H2-H2 match: YES (1.87569680e-42 vs 1.87005973e-42)
+[2025-05-15 15:10:33] H2-He match: YES (1.00766923e-42 vs 1.00348383e-42)
+[2025-05-15 15:10:33] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:33] N2-N2 match: YES (2.11919040e-42 vs 2.20228093e-42)
+[2025-05-15 15:10:33] N2-H2 match: YES (4.67047625e-42 vs 4.82936769e-42)
+[2025-05-15 15:10:33] CO2-CO2 match: YES (2.35502660e-41 vs 2.37520808e-41)
+[2025-05-15 15:10:33] CIA verification complete: All matches OK
+[2025-05-15 15:10:33] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:36] H2-H2 match: YES (1.87569680e-42 vs 1.87115927e-42)
+[2025-05-15 15:10:36] H2-He match: YES (1.00766923e-42 vs 1.00530836e-42)
+[2025-05-15 15:10:36] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:36] N2-N2 match: YES (2.11919040e-42 vs 2.20481718e-42)
+[2025-05-15 15:10:36] N2-H2 match: YES (4.67047625e-42 vs 4.83736067e-42)
+[2025-05-15 15:10:36] CO2-CO2 match: YES (2.35502660e-41 vs 2.37245944e-41)
+[2025-05-15 15:10:36] CIA verification complete: All matches OK
+[2025-05-15 15:10:36] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:40] H2-H2 match: YES (1.87569680e-42 vs 1.87224841e-42)
+[2025-05-15 15:10:40] H2-He match: YES (1.00766923e-42 vs 1.00711546e-42)
+[2025-05-15 15:10:40] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:40] N2-N2 match: YES (2.11919040e-42 vs 2.20728201e-42)
+[2025-05-15 15:10:40] N2-H2 match: YES (4.67047625e-42 vs 4.84517722e-42)
+[2025-05-15 15:10:40] CO2-CO2 match: YES (2.35502660e-41 vs 2.36973658e-41)
+[2025-05-15 15:10:40] CIA verification complete: All matches OK
+[2025-05-15 15:10:40] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:43] H2-H2 match: YES (1.87569680e-42 vs 1.87330888e-42)
+[2025-05-15 15:10:43] H2-He match: YES (1.00766923e-42 vs 1.00895009e-42)
+[2025-05-15 15:10:43] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:43] N2-N2 match: YES (2.11919040e-42 vs 2.20981771e-42)
+[2025-05-15 15:10:43] N2-H2 match: YES (4.67047625e-42 vs 4.85300861e-42)
+[2025-05-15 15:10:43] CO2-CO2 match: YES (2.35502660e-41 vs 2.36717388e-41)
+[2025-05-15 15:10:43] CIA verification complete: All matches OK
+[2025-05-15 15:10:43] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:46] H2-H2 match: YES (1.87569680e-42 vs 1.87435652e-42)
+[2025-05-15 15:10:46] H2-He match: YES (1.00766923e-42 vs 1.01077442e-42)
+[2025-05-15 15:10:46] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:46] N2-N2 match: YES (2.11919040e-42 vs 2.21237114e-42)
+[2025-05-15 15:10:46] N2-H2 match: YES (4.67047625e-42 vs 4.86083745e-42)
+[2025-05-15 15:10:46] CO2-CO2 match: YES (2.35502660e-41 vs 2.36465621e-41)
+[2025-05-15 15:10:46] CIA verification complete: All matches OK
+[2025-05-15 15:10:46] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:49] H2-H2 match: YES (1.87569680e-42 vs 1.87539128e-42)
+[2025-05-15 15:10:49] H2-He match: YES (1.00766923e-42 vs 1.01258891e-42)
+[2025-05-15 15:10:49] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:49] N2-N2 match: YES (2.11919040e-42 vs 2.21476456e-42)
+[2025-05-15 15:10:49] N2-H2 match: YES (4.67047625e-42 vs 4.86828472e-42)
+[2025-05-15 15:10:49] CO2-CO2 match: YES (2.35502660e-41 vs 2.36218435e-41)
+[2025-05-15 15:10:49] CIA verification complete: All matches OK
+[2025-05-15 15:10:49] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:52] H2-H2 match: YES (1.87569680e-42 vs 1.87641002e-42)
+[2025-05-15 15:10:52] H2-He match: YES (1.00766923e-42 vs 1.01440151e-42)
+[2025-05-15 15:10:52] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:52] N2-N2 match: YES (2.11919040e-42 vs 2.21653689e-42)
+[2025-05-15 15:10:52] N2-H2 match: YES (4.67047625e-42 vs 4.87434947e-42)
+[2025-05-15 15:10:52] CO2-CO2 match: YES (2.35502660e-41 vs 2.35978157e-41)
+[2025-05-15 15:10:52] CIA verification complete: All matches OK
+[2025-05-15 15:10:52] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:56] H2-H2 match: YES (1.87569680e-42 vs 1.87741559e-42)
+[2025-05-15 15:10:56] H2-He match: YES (1.00766923e-42 vs 1.01620326e-42)
+[2025-05-15 15:10:56] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:56] N2-N2 match: YES (2.11919040e-42 vs 2.21827579e-42)
+[2025-05-15 15:10:56] N2-H2 match: YES (4.67047625e-42 vs 4.88030192e-42)
+[2025-05-15 15:10:56] CO2-CO2 match: YES (2.35502660e-41 vs 2.35742475e-41)
+[2025-05-15 15:10:56] CIA verification complete: All matches OK
+[2025-05-15 15:10:56] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:10:59] H2-H2 match: YES (1.87569680e-42 vs 1.87840063e-42)
+[2025-05-15 15:10:59] H2-He match: YES (1.00766923e-42 vs 1.01801125e-42)
+[2025-05-15 15:10:59] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:10:59] N2-N2 match: YES (2.11919040e-42 vs 2.21986944e-42)
+[2025-05-15 15:10:59] N2-H2 match: YES (4.67047625e-42 vs 4.88585999e-42)
+[2025-05-15 15:10:59] CO2-CO2 match: YES (2.35502660e-41 vs 2.35516668e-41)
+[2025-05-15 15:10:59] CIA verification complete: All matches OK
+[2025-05-15 15:10:59] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:11:02] H2-H2 match: YES (1.87569680e-42 vs 1.87937071e-42)
+[2025-05-15 15:11:02] H2-He match: YES (1.00766923e-42 vs 1.01981132e-42)
+[2025-05-15 15:11:02] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:11:02] N2-N2 match: YES (2.11919040e-42 vs 2.22141887e-42)
+[2025-05-15 15:11:02] N2-H2 match: YES (4.67047625e-42 vs 4.89127322e-42)
+[2025-05-15 15:11:02] CO2-CO2 match: YES (2.35502660e-41 vs 2.35296597e-41)
+[2025-05-15 15:11:02] CIA verification complete: All matches OK
+[2025-05-15 15:11:02] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:11:05] H2-H2 match: YES (1.87569680e-42 vs 1.88033018e-42)
+[2025-05-15 15:11:05] H2-He match: YES (1.00766923e-42 vs 1.02159183e-42)
+[2025-05-15 15:11:05] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:11:05] N2-N2 match: YES (2.11919040e-42 vs 2.22267201e-42)
+[2025-05-15 15:11:05] N2-H2 match: YES (4.67047625e-42 vs 4.89603246e-42)
+[2025-05-15 15:11:05] CO2-CO2 match: YES (2.35502660e-41 vs 2.35078942e-41)
+[2025-05-15 15:11:05] CIA verification complete: All matches OK
+[2025-05-15 15:11:05] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:11:08] H2-H2 match: YES (1.87569680e-42 vs 1.88127667e-42)
+[2025-05-15 15:11:08] H2-He match: YES (1.00766923e-42 vs 1.02335793e-42)
+[2025-05-15 15:11:08] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:11:08] N2-N2 match: YES (2.11919040e-42 vs 2.22395402e-42)
+[2025-05-15 15:11:08] N2-H2 match: YES (4.67047625e-42 vs 4.90081599e-42)
+[2025-05-15 15:11:08] CO2-CO2 match: YES (2.35502660e-41 vs 2.34865376e-41)
+[2025-05-15 15:11:08] CIA verification complete: All matches OK
+[2025-05-15 15:11:08] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:11:12] H2-H2 match: YES (1.87569680e-42 vs 1.88228515e-42)
+[2025-05-15 15:11:12] H2-He match: YES (1.00766923e-42 vs 1.02527810e-42)
+[2025-05-15 15:11:12] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:11:12] N2-N2 match: YES (2.11919040e-42 vs 2.22507418e-42)
+[2025-05-15 15:11:12] N2-H2 match: YES (4.67047625e-42 vs 4.90535450e-42)
+[2025-05-15 15:11:12] CO2-CO2 match: YES (2.35502660e-41 vs 2.34642349e-41)
+[2025-05-15 15:11:12] CIA verification complete: All matches OK
+[2025-05-15 15:11:12] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:11:15] H2-H2 match: YES (1.87569680e-42 vs 1.88320394e-42)
+[2025-05-15 15:11:15] H2-He match: YES (1.00766923e-42 vs 1.02705690e-42)
+[2025-05-15 15:11:15] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:11:15] N2-N2 match: YES (2.11919040e-42 vs 2.22660797e-42)
+[2025-05-15 15:11:15] N2-H2 match: YES (4.67047625e-42 vs 4.91055529e-42)
+[2025-05-15 15:11:15] CO2-CO2 match: YES (2.35502660e-41 vs 2.34442618e-41)
+[2025-05-15 15:11:15] CIA verification complete: All matches OK
+[2025-05-15 15:11:15] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:11:18] H2-H2 match: YES (1.87569680e-42 vs 1.88413114e-42)
+[2025-05-15 15:11:18] H2-He match: YES (1.00766923e-42 vs 1.02880310e-42)
+[2025-05-15 15:11:18] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:11:18] N2-N2 match: YES (2.11919040e-42 vs 2.22741166e-42)
+[2025-05-15 15:11:18] N2-H2 match: YES (4.67047625e-42 vs 4.91426397e-42)
+[2025-05-15 15:11:18] CO2-CO2 match: YES (2.35502660e-41 vs 2.34235301e-41)
+[2025-05-15 15:11:18] CIA verification complete: All matches OK
+[2025-05-15 15:11:18] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:11:21] H2-H2 match: YES (1.87569680e-42 vs 1.88509973e-42)
+[2025-05-15 15:11:21] H2-He match: YES (1.00766923e-42 vs 1.03065556e-42)
+[2025-05-15 15:11:21] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:11:21] N2-N2 match: YES (2.11919040e-42 vs 2.22801554e-42)
+[2025-05-15 15:11:21] N2-H2 match: YES (4.67047625e-42 vs 4.91761063e-42)
+[2025-05-15 15:11:21] CO2-CO2 match: YES (2.35502660e-41 vs 2.34022066e-41)
+[2025-05-15 15:11:21] CIA verification complete: All matches OK
+[2025-05-15 15:11:21] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:11:24] H2-H2 match: YES (1.87569680e-42 vs 1.88615759e-42)
+[2025-05-15 15:11:24] H2-He match: YES (1.00766923e-42 vs 1.03263841e-42)
+[2025-05-15 15:11:24] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:11:24] N2-N2 match: YES (2.11919040e-42 vs 2.22810900e-42)
+[2025-05-15 15:11:24] N2-H2 match: YES (4.67047625e-42 vs 4.92009736e-42)
+[2025-05-15 15:11:24] CO2-CO2 match: YES (2.35502660e-41 vs 2.33784424e-41)
+[2025-05-15 15:11:24] CIA verification complete: All matches OK
+[2025-05-15 15:11:24] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:11:27] H2-H2 match: YES (1.87569680e-42 vs 1.88720528e-42)
+[2025-05-15 15:11:27] H2-He match: YES (1.00766923e-42 vs 1.03460158e-42)
+[2025-05-15 15:11:27] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:11:27] N2-N2 match: YES (2.11919040e-42 vs 2.22843283e-42)
+[2025-05-15 15:11:27] N2-H2 match: YES (4.67047625e-42 vs 4.92305310e-42)
+[2025-05-15 15:11:27] CO2-CO2 match: YES (2.35502660e-41 vs 2.33548992e-41)
+[2025-05-15 15:11:27] CIA verification complete: All matches OK
+[2025-05-15 15:11:27] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:11:31] H2-H2 match: YES (1.87569680e-42 vs 1.88823674e-42)
+[2025-05-15 15:11:31] H2-He match: YES (1.00766923e-42 vs 1.03655864e-42)
+[2025-05-15 15:11:31] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:11:31] N2-N2 match: YES (2.11919040e-42 vs 2.22851133e-42)
+[2025-05-15 15:11:31] N2-H2 match: YES (4.67047625e-42 vs 4.92542929e-42)
+[2025-05-15 15:11:31] CO2-CO2 match: YES (2.35502660e-41 vs 2.33320073e-41)
+[2025-05-15 15:11:31] CIA verification complete: All matches OK
+[2025-05-15 15:11:31] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:11:34] H2-H2 match: YES (1.87569680e-42 vs 1.88925531e-42)
+[2025-05-15 15:11:34] H2-He match: YES (1.00766923e-42 vs 1.03849921e-42)
+[2025-05-15 15:11:34] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:11:34] N2-N2 match: YES (2.11919040e-42 vs 2.22880394e-42)
+[2025-05-15 15:11:34] N2-H2 match: YES (4.67047625e-42 vs 4.92822643e-42)
+[2025-05-15 15:11:34] CO2-CO2 match: YES (2.35502660e-41 vs 2.33094951e-41)
+[2025-05-15 15:11:34] CIA verification complete: All matches OK
+[2025-05-15 15:11:34] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:11:37] H2-H2 match: YES (1.87569680e-42 vs 1.89025796e-42)
+[2025-05-15 15:11:37] H2-He match: YES (1.00766923e-42 vs 1.04042675e-42)
+[2025-05-15 15:11:37] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:11:37] N2-N2 match: YES (2.11919040e-42 vs 2.22896395e-42)
+[2025-05-15 15:11:37] N2-H2 match: YES (4.67047625e-42 vs 4.93069154e-42)
+[2025-05-15 15:11:37] CO2-CO2 match: YES (2.35502660e-41 vs 2.32875386e-41)
+[2025-05-15 15:11:37] CIA verification complete: All matches OK
+[2025-05-15 15:11:37] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:11:40] H2-H2 match: YES (1.87569680e-42 vs 1.89123674e-42)
+[2025-05-15 15:11:40] H2-He match: YES (1.00766923e-42 vs 1.04235888e-42)
+[2025-05-15 15:11:40] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:11:40] N2-N2 match: YES (2.11919040e-42 vs 2.22941203e-42)
+[2025-05-15 15:11:40] N2-H2 match: YES (4.67047625e-42 vs 4.93367336e-42)
+[2025-05-15 15:11:40] CO2-CO2 match: YES (2.35502660e-41 vs 2.32666998e-41)
+[2025-05-15 15:11:40] CIA verification complete: All matches OK
+[2025-05-15 15:11:40] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:11:43] H2-H2 match: YES (1.87569680e-42 vs 1.89222107e-42)
+[2025-05-15 15:11:43] H2-He match: YES (1.00766923e-42 vs 1.04427793e-42)
+[2025-05-15 15:11:43] H2-H match: YES (7.86373182e-42 vs 7.86373182e-42)
+[2025-05-15 15:11:43] N2-N2 match: YES (2.11919040e-42 vs 2.22957549e-42)
+[2025-05-15 15:11:43] N2-H2 match: YES (4.67047625e-42 vs 4.93598125e-42)
+[2025-05-15 15:11:43] CO2-CO2 match: YES (2.35502660e-41 vs 2.32463698e-41)
+[2025-05-15 15:11:43] CIA verification complete: All matches OK
+[2025-05-15 15:11:43] WARNING: H2-H2 checksums match but very few non-zero values - possible zeroing issue
+[2025-05-15 15:33:05] H2-H2 CIA file has 19991 lines of data
+[2025-05-15 15:33:54] Checksums calculated - H2-H2: 1.875697e-42 (nonzero: 0, max: 4.773744e-45)
+[2025-05-15 15:33:54] Checksums calculated - H2-He: 1.007669e-42 (nonzero: 0, max: 1.422837e-45)
+[2025-05-15 16:17:36] Checksums calculated - H2-H2: 1.875697e-42 (nonzero: 0, max: 4.773744e-45)
+[2025-05-15 16:17:36] Checksums calculated - H2-He: 1.007669e-42 (nonzero: 0, max: 1.422837e-45)
+[2025-05-15 21:49:35] Checksums calculated - H2-H2: 1.875697e-42 (nonzero: 0, max: 4.773744e-45)
+[2025-05-15 21:49:35] Checksums calculated - H2-He: 1.007669e-42 (nonzero: 0, max: 1.422837e-45)
+[2025-05-16 18:51:43] Checksums calculated - H2-H2: 1.875697e-42 (nonzero: 0, max: 4.773744e-45)
+[2025-05-16 18:51:43] Checksums calculated - H2-He: 1.007669e-42 (nonzero: 0, max: 1.422837e-45)
+[2025-05-17 16:30:25] Checksums calculated - H2-H2: 1.875697e-42 (nonzero: 0, max: 4.773744e-45)
+[2025-05-17 16:30:25] Checksums calculated - H2-He: 1.007669e-42 (nonzero: 0, max: 1.422837e-45)
+[2025-05-17 16:36:39] Checksums calculated - H2-H2: 1.875697e-42 (nonzero: 0, max: 4.773744e-45)
+[2025-05-17 16:36:39] Checksums calculated - H2-He: 1.007669e-42 (nonzero: 0, max: 1.422837e-45)
+[2025-05-17 17:53:03] Checksums calculated - H2-H2: 1.875697e-42 (nonzero: 0, max: 4.773744e-45)
+[2025-05-17 17:53:03] Checksums calculated - H2-He: 1.007669e-42 (nonzero: 0, max: 1.422837e-45)
+[2025-05-17 18:33:49] Checksums calculated - H2-H2: 1.875697e-42 (nonzero: 0, max: 4.773744e-45)
+[2025-05-17 18:33:49] Checksums calculated - H2-He: 1.007669e-42 (nonzero: 0, max: 1.422837e-45)
+[2025-05-20 10:37:50] Checksums calculated - H2-H2: 1.875697e-42 (nonzero: 0, max: 4.773744e-45)
+[2025-05-20 10:37:50] Checksums calculated - H2-He: 1.007669e-42 (nonzero: 0, max: 1.422837e-45)
