@@ -6,8 +6,9 @@
 * Mantas Zilinskas (Jet Propulsion Laboratory, California Institute of Technology)
 
 ## Quick user guide
-* To compile: gcc epacris_main.c -lm then ./a.out
-* Config file is config.h in the root folder. 
+* To compile: gcc epacris_main.c -lm
+* To run: ./a.out
+* Config file is *config.h* in the root folder. 
 
 ## Full Documentation
 TBD
