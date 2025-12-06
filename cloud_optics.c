@@ -1,20 +1,9 @@
 /**
  * cloud_optics.c
  * 
- * Functions to read and store cloud optical property lookup tables from LX-Mie output
- * Based on HELIOS clouds.py implementation
- * 
- * Data files from CLOUD_MIE_DIRECTORY/SPECIES_NAME_s/ (e.g., Clouds/LXMieOuput/H2O_s/):
- * - r0.010000.dat, r0.012589.dat, ... (particle radius in filename, in microns)
- * - Each file contains: wavelength, extinction, scattering, absorption, albedo, asymmetry g
- * 
+ * Functions to read and store cloud optical property lookup tables from MIE tables
  * Cloud species is configured via CLOUD_SPECIES in config.h (species ID, e.g., 7 for H2O)
- * Directory path is built from CLOUD_MIE_DIRECTORY and species name (e.g., "Clouds/LXMieOuput/H2O_s")
- * 
- * File format:
- * # Header line
- * wavelength(μm)  size_param  extinction(cm²)  scattering(cm²)  absorption(cm²)  albedo  asymmetry_g
- */
+**/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,10 +14,11 @@
 #include "global_temp.h"  // For zbin, NSP, NLAMBDA, NCONDENSIBLES, CONDENSIBLES
 #include "conv_cond_funcs.h"  // For get_species_name()
 #include "config.h"  // For CLOUD_MIE_DIRECTORY and CLOUD_SPECIES
+#include "ms_functions.h"
 
 // Include config file for debug switches (if not already included)
-#ifndef CLOUD_DEBUG
-#define CLOUD_DEBUG 0  // Default to disabled if not defined
+#ifndef CLOUD_DEBUG_MIE
+#define CLOUD_DEBUG_MIE 0  // Default to disabled if not defined
 #endif
 
 // Global optical property tables - array for multiple cloud species
@@ -36,10 +26,11 @@ CloudOpticalTableMie cloud_mie_optics[MAX_CLOUD_SPECIES];
 int cloud_species_ids[MAX_CLOUD_SPECIES];
 int n_cloud_species_loaded = 0;
 
-/**
- * Extract particle radius from filename like "r0.010000.dat"
- * Returns radius in micrometers, or -1.0 on error
- */
+//--------------------------------------------------------------------- 
+//  For LX-Mie format only
+//  Extract particle radius from filename like "r0.010000.dat"
+//  Returns radius in micrometers, or -1.0 on error
+//--------------------------------------------------------------------- 
 static double extract_radius_from_filename(const char *filename) {
     // Skip "r" prefix
     if (filename[0] != 'r') {
@@ -401,12 +392,12 @@ cleanup_error:
 
 /**
  * Read all EPACRIS format cloud optical tables for cloud species (defined in config.h)
- * Reads Albedo_*.dat, Cross_*.dat, Geo_*.dat files for each species
+ * Reads Albedo.dat, Cross.dat, Geo.dat files for each species
  */
 static void read_cloud_optical_tables_epacris(void) {
-    printf("=======================================================\n");
+    printf("%s\n",fillmi); 
     printf("READING CLOUD OPTICAL PROPERTY TABLES (EPACRIS FORMAT)\n");
-    printf("=======================================================\n");
+    printf("%s\n",fillmi); 
     
     // Initialize counter
     n_cloud_species_loaded = 0;
@@ -426,7 +417,7 @@ static void read_cloud_optical_tables_epacris(void) {
             continue;
         }
         
-        printf("\n--- Processing cloud species %d/%d: %s (ID: %d) ---\n", 
+        printf("--- Processing cloud species %d/%d: %s (ID: %d) ---\n", 
                species_idx + 1, n_cloud_species, species_name, species_id);
         
         // Build directory path: CLOUD_MIE_DIRECTORY_EPACRIS/SPECIES_NAME
@@ -453,15 +444,15 @@ static void read_cloud_optical_tables_epacris(void) {
         printf("Successfully loaded optical tables for %s\n", species_name);
     }
     
-    printf("\n=======================================================\n");
+    printf("%s\n",fillmi); 
     printf("Loaded optical tables for %d cloud species\n", n_cloud_species_loaded);
-    printf("=======================================================\n");
+    printf("%s\n",fillmi); 
     
     // Print summary for each loaded species
     for (int i = 0; i < n_cloud_species_loaded; i++) {
         const char *species_name = get_species_name(cloud_species_ids[i]);
         CloudOpticalTableMie *optics = &cloud_mie_optics[i];
-        printf("\nSpecies %d: %s (ID: %d)\n", i+1, species_name, cloud_species_ids[i]);
+        printf("Species %d: %s (ID: %d)\n", i+1, species_name, cloud_species_ids[i]);
         printf("  Particle size range: %.6f - %.6f micrometers\n", 
                optics->radius[0], 
                optics->radius[optics->n_particle_sizes-1]);
@@ -471,24 +462,25 @@ static void read_cloud_optical_tables_epacris(void) {
                optics->wavelength[0],
                optics->wavelength[optics->n_wavelengths-1]);
     }
-    printf("=======================================================\n");
+    printf("%s\n",fillmi); 
 }
 
-/**
- * Read all LX-Mie output files for cloud species (defined in config.h)
- * Scans directory, finds all r*.dat files, sorts by particle radius, reads them
- * Now supports multiple cloud species
- */
+//--------------------------------------------------------------------- 
+//  Read all MIE output files for cloud species (defined in config.h)
+//  Main function called from epacris_main.c
+//--------------------------------------------------------------------- 
 void read_cloud_optical_tables_mie(void) {
     // Check which format to use
+    // Currently can use LX-MIE (like in HELIOS) or EPACRIS format for MIE tables
+
     #if USE_EPACRIS_FORMAT
         read_cloud_optical_tables_epacris();
         return;
     #endif
     
-    printf("=======================================================\n");
+    printf("%s\n",fillmi); 
     printf("READING CLOUD OPTICAL PROPERTY TABLES (LX-MIE FORMAT)\n");
-    printf("=======================================================\n");
+    printf("%s\n",fillmi); 
     
     // Initialize counter
     n_cloud_species_loaded = 0;
@@ -514,7 +506,6 @@ void read_cloud_optical_tables_mie(void) {
         
         // Build directory path: CLOUD_MIE_DIRECTORY_LXMIE/SPECIES_NAME
         char directory[512];
-        // Adapt this for every species that has suffixes or prefixes to regular species names
         snprintf(directory, sizeof(directory), "%s/%s", CLOUD_MIE_DIRECTORY_LXMIE, species_name);
         
         
@@ -650,9 +641,9 @@ void read_cloud_optical_tables_mie(void) {
         printf("Successfully loaded optical tables for %s\n", species_name);
     }
     
-    printf("\n=======================================================\n");
+    printf("%s\n",fillmi); 
     printf("Loaded optical tables for %d cloud species\n", n_cloud_species_loaded);
-    printf("=======================================================\n");
+    printf("%s\n",fillmi); 
     
     // Print summary for each loaded species
     for (int i = 0; i < n_cloud_species_loaded; i++) {
@@ -668,7 +659,7 @@ void read_cloud_optical_tables_mie(void) {
                optics->wavelength[0],
                optics->wavelength[optics->n_wavelengths-1]);
     }
-    printf("=======================================================\n");
+    printf("%s\n",fillmi); 
 }
 
 
@@ -796,7 +787,7 @@ static int get_cloud_output_arrays(int species_id, double ***c_out, double ***a_
  */
 void calculate_cloud_opacity_arrays(void) {
     // All arrays accessed as globals:
-    // Inputs: clouds, particle_r2, particle_r0, particle_VP, particle_mass, wavelength
+    // Inputs: clouds, particle_r2, particle_number_density, wavelength
     // Outputs: cH2O, aH2O, gH2O, cNH3, aNH3, gNH3
         
     // Loop through all loaded cloud species
@@ -852,21 +843,21 @@ void calculate_cloud_opacity_arrays(void) {
                 continue;
             }
             
-            // Get mode radius (r0) for this layer and condensible species
-            // r0 is the nucleation/monomer radius in micrometers [μm]
+            // Use volume-weighted radius (r2, 2nd moment) for cloud optics interpolation
+            // This matches the EPACRIS format specification and is used for both formats
             // Note: Interpolation functions handle out-of-range values automatically
             // by clamping to the actual lookup table range
-            double r0 = particle_r0[j][cloud_species_idx];
+            double particle_radius = particle_r2[j][cloud_species_idx];
             
             // Particle number density: stored in particles/m³, convert to particles/cm³
             double particle_number_density_cm3 = particle_number_density[j][cloud_species_idx] * 1.0e-6;  // particles/m³ -> particles/cm³
             
             // Debug: Print interpolation parameters only for layers with non-zero particle size
-            // Check both r0 and particle number density to ensure we only print for actual clouds
-#if CLOUD_DEBUG
-            if (r0 > 1e-10 && particle_number_density[j][cloud_species_idx] > 1e-10) {
+            // Check both particle_radius and particle number density to ensure we only print for actual clouds
+#if CLOUD_DEBUG_MIE
+            if (particle_radius > 1e-10 && particle_number_density[j][cloud_species_idx] > 1e-10) {
                 printf("\n=== CLOUD OPTICS INTERPOLATION DEBUG (Layer %d) ===\n", j);
-                printf("particle_r0[%d][%d] = %.6e μm\n", j, cloud_species_idx, r0);
+                printf("particle_r2[%d][%d] = %.6e μm (volume-weighted, 2nd moment)\n", j, cloud_species_idx, particle_radius);
                 printf("Lookup table radius range: %.6e - %.6e μm\n", 
                        optics->radius[0], 
                        optics->radius[optics->n_particle_sizes-1]);
@@ -900,23 +891,23 @@ void calculate_cloud_opacity_arrays(void) {
                 
                 // Extinction cross-section: log-log interpolation (matches cloud_interp.c line 167: H2OI_c)
                 ext_cross_interp[w] = interp1_loglog(optics->radius, ext_per_r, 
-                                                       optics->n_particle_sizes, r0);
+                                                       optics->n_particle_sizes, particle_radius);
                 
                 // Albedo: linear in log-radius space (matches cloud_interp.c line 168: H2OI_a)
                 albedo_interp[w] = interp1_log(optics->radius, alb_per_r,
-                                               optics->n_particle_sizes, r0);
+                                               optics->n_particle_sizes, particle_radius);
                 
                 // Asymmetry: linear in log-radius space (matches cloud_interp.c line 169: H2OI_g)
                 asym_interp[w] = interp1_log(optics->radius, asym_per_r,
-                                            optics->n_particle_sizes, r0);
+                                            optics->n_particle_sizes, particle_radius);
             
                 // Debug: Print interpolation results for layers with non-zero particle size (first 3 wavelengths)
-#if CLOUD_DEBUG
-                if (r0 > 1e-10 && particle_number_density[j][cloud_species_idx] > 1e-10 && w < 3) {
-                    // Find bracketing indices for r0
+#if CLOUD_DEBUG_MIE
+                if (particle_radius > 1e-10 && particle_number_density[j][cloud_species_idx] > 1e-10 && w < 3) {
+                    // Find bracketing indices for particle_radius
                     int idx_low = -1, idx_high = -1;
                     for (int r = 0; r < optics->n_particle_sizes - 1; r++) {
-                        if (r0 >= optics->radius[r] && r0 <= optics->radius[r+1]) {
+                        if (particle_radius >= optics->radius[r] && particle_radius <= optics->radius[r+1]) {
                             idx_low = r;
                             idx_high = r + 1;
                             break;
@@ -925,20 +916,20 @@ void calculate_cloud_opacity_arrays(void) {
                     
                     printf("\n  Wavelength %d (%.6e μm):\n", w, optics->wavelength[w]);
                     if (idx_low >= 0) {
-                        printf("    Lookup table radii: %.6e - %.6e μm (bracketing r0=%.6e)\n",
-                               optics->radius[idx_low], optics->radius[idx_high], r0);
+                        printf("    Lookup table radii: %.6e - %.6e μm (bracketing radius=%.6e)\n",
+                               optics->radius[idx_low], optics->radius[idx_high], particle_radius);
                         printf("    Extinction at radii: %.6e, %.6e cm²\n",
                                ext_per_r[idx_low], ext_per_r[idx_high]);
                         printf("    Albedo at radii: %.6f, %.6f\n",
                                alb_per_r[idx_low], alb_per_r[idx_high]);
                         printf("    Asymmetry at radii: %.6f, %.6f\n",
                                asym_per_r[idx_low], asym_per_r[idx_high]);
-                    } else if (r0 <= optics->radius[0]) {
-                        printf("    r0 below lookup range - using first table value\n");
+                    } else if (particle_radius <= optics->radius[0]) {
+                        printf("    particle_radius below lookup range - using first table value\n");
                         printf("    Extinction: %.6e cm² (from radius %.6e μm)\n",
                                ext_per_r[0], optics->radius[0]);
                     } else {
-                        printf("    r0 above lookup range - using last table value\n");
+                        printf("    particle_radius above lookup range - using last table value\n");
                         printf("    Extinction: %.6e cm² (from radius %.6e μm)\n",
                                ext_per_r[optics->n_particle_sizes-1],
                                optics->radius[optics->n_particle_sizes-1]);
@@ -955,8 +946,8 @@ void calculate_cloud_opacity_arrays(void) {
             }  // End Mie wavelength loop
             
             // Debug: Print summary for layers with non-zero particle size
-#if CLOUD_DEBUG
-            if (r0 > 1e-10 && particle_number_density[j][cloud_species_idx] > 1e-10) {
+#if CLOUD_DEBUG_MIE
+            if (particle_radius > 1e-10 && particle_number_density[j][cloud_species_idx] > 1e-10) {
                 printf("\n  Interpolation complete for layer %d\n", j);
                 printf("  Sample interpolated values (first 3 wavelengths):\n");
                 for (int w = 0; w < 3 && w < optics->n_wavelengths; w++) {
@@ -964,7 +955,7 @@ void calculate_cloud_opacity_arrays(void) {
                            optics->wavelength[w],
                            ext_cross_interp[w], albedo_interp[w], asym_interp[w]);
                 }
-                printf("================================================\n");
+                printf("%s\n",fillmi); 
             }
 #endif
             
@@ -982,8 +973,8 @@ void calculate_cloud_opacity_arrays(void) {
                                                     optics->n_wavelengths, wavelength_rt_micron);
                 
                 // Debug: Print wavelength interpolation results for layers with non-zero particle size (first 5 wavelengths)
-#if CLOUD_DEBUG
-                if (r0 > 1e-10 && particle_number_density[j][cloud_species_idx] > 1e-10 && i < 5) {
+#if CLOUD_DEBUG_MIE
+                if (particle_radius > 1e-10 && particle_number_density[j][cloud_species_idx] > 1e-10 && i < 5) {
                 // Find bracketing indices for wavelength
                 int idx_low = -1, idx_high = -1;
                 for (int w = 0; w < optics->n_wavelengths - 1; w++) {
@@ -1032,8 +1023,8 @@ void calculate_cloud_opacity_arrays(void) {
             }  // End RT wavelength loop
             
             // Debug: Print summary for wavelength interpolation
-#if CLOUD_DEBUG
-            if (r0 > 1e-10 && particle_number_density[j][cloud_species_idx] > 1e-10) {
+#if CLOUD_DEBUG_MIE
+            if (particle_radius > 1e-10 && particle_number_density[j][cloud_species_idx] > 1e-10) {
                 printf("\n  Wavelength interpolation complete for layer %d\n", j);
                 printf("  Sample final RT values (first 5 wavelengths):\n");
                 for (int i = 0; i < 5 && i < NLAMBDA; i++) {
@@ -1041,7 +1032,7 @@ void calculate_cloud_opacity_arrays(void) {
                     printf("    λ=%.6e nm: c%s=%.6e cm⁻¹, a%s=%.6f, g%s=%.6f\n",
                            wavelength[i], species_name, c_out[j][i], species_name, a_out[j][i], species_name, g_out[j][i]);
                 }
-                printf("================================================\n");
+                printf("%s\n",fillmi); 
             }
 #endif
         }  // End layer loop

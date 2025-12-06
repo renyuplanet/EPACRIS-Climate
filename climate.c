@@ -721,7 +721,7 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
         // printf("%s %d\n", "Change in convective layer is", isconv_sum);
         
         // DIAGNOSTIC: Show convection status
-        printf("\n=== CONVECTIVE ADJUSTMENT SUMMARY ===\n");
+        printf("\n--- CONVECTIVE ADJUSTMENT SUMMARY ---\n");
         printf("RC iteration %d: Found %d convective layers, %d radiative layers\n", i, ncl, nrl);
         printf("Convective boundary changes: %d layers\n", isconv_sum);
         
@@ -741,7 +741,7 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
             printf("This suggests NRT_RC=%d may be too small for radiative convergence.\n", NRT_RC);
             printf("Consider increasing NRT_RC or relaxing radiative tolerances.\n");
         }
-        printf("=====================================\n\n");
+        printf("----------------------------------------------------------------------\n");
 
         if ((TIME_STEPPING == 0) || (pcount == PRINT_ITER))
         {
@@ -793,18 +793,18 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
 
         // DETERMINE IF CONVERGED
         if (isconv_sum == 0 && i!=1 && sumisequil>=zbin) {
-            printf("%s\n",filleq);
+            printf("%s\n",fillmi); 
             printf("Climate converged\n");
-            printf("%s\n",filleq);
+            printf("%s\n",fillmi); 
             
 
             break;
         }
     
         if (ncl == 0) {
-            printf("%s\n",filleq);
+            printf("%s\n",fillmi); 
             printf("No convective layers found. Rad-Conv-loop done, but not all layers meet selected radiative equilibrium requirement\n");
-            printf("%s\n",filleq);
+            printf("%s\n",fillmi); 
             
 
             break;

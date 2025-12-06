@@ -16,9 +16,9 @@
 #define OPACITY_SPECIES_LIST \
     "H2O", "NH3", "CO2", "CO", "CH4", \
      "H2S", "N2", "OH", "C2H6", "CH2O2", \
-     "HNO3", "N2O", "SO2", "NO2", "NO", \
-     "O2", "O3", "OCS", "HCN", "HO2", \
-     "C2H2", "C2H4", "H2CO", "H2O2"
+    //  "HNO3", "N2O", "SO2", "NO2", "NO", \
+    //  "O2", "O3", "OCS", "HCN", "HO2", \
+    //  "C2H2", "C2H4", "H2CO", "H2O2"
      
 // Opacity file directory
 #define CROSSHEADING		"../Opacity/main_opacities/"
@@ -31,13 +31,14 @@
 // Supersaturation parameter for particle sizing
 #define DELTA_P 1.0e-12 // Needs separate mode where it is determined automatically
 
+// Print cloud debugging output in terminal
+#define CLOUD_DEBUG_MIE 0  // 0 = disable cloud optics debugging output
+                       // 1 = enable detailed cloud optics interpolation debugging
+#define CLOUD_DEBUG_RT 1  // 0 = disable cloud albedo diagnostics in radiative transfer
+                       // 1 = enable cloud albedo summary output during RT calculations
+
 // Cold trap, limits the abundance above condensation region
 #define ENABLE_COLD_TRAP  1  // 0 = disabled, 1 = enabled (affects only condensibles)
-
-
-// Print cloud debugging output in terminal
-#define CLOUD_DEBUG 0  // 0 = disable cloud optics debugging output
-                       // 1 = enable detailed cloud optics interpolation debugging
 
 // Cloud Mie scattering directory, only need one of these
 #define USE_EPACRIS_FORMAT 1  // 0 = use LX-Mie format, 1 = use EPACRIS format
@@ -148,7 +149,7 @@
 //--------------------------------------------------------------------- 
 #define NMAX        1       /* Maximum Climate - Chemistry Iterations - Don't need more than 1 with opacity updating */
 #define NMAX_RC     10      /* Maximum Radiative - Convective Iterations, minimum 1 */
-#define NMAX_RT     100     /* Maximum Radiative Transfer Iterations */
+#define NMAX_RT     200     /* Maximum Radiative Transfer Iterations */
 #define NRT_RC      50      /*RT steps between Convective adjustments after initial RT equilibrium (Helios uses 1 step) */
 //--------------------------------------------------------------------- 
 

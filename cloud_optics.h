@@ -31,7 +31,7 @@ extern int CONDENSIBLES[];
 // Maximum number of cloud species supported
 #define MAX_CLOUD_SPECIES 10
 
-// Cloud optical property data structures (LX-Mie format)
+// Cloud optical property data structures
 // Format: [particle_size_index][wavelength_index]
 typedef struct {
     int n_particle_sizes;                                      // Actual number of particle sizes found

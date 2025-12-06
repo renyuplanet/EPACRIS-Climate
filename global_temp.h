@@ -72,6 +72,7 @@ extern double GA; // Gravitational acceleration
 
 // Enhanced cloud physics arrays
 extern double particle_r2[zbin+1][MAX_CONDENSIBLES];
+extern double particle_r1[zbin+1][MAX_CONDENSIBLES];  // Surface-area-weighted radius [μm] (for cloud optics)
 extern double particle_r0[zbin+1][MAX_CONDENSIBLES];  // Mode radius (nucleation/monomer radius) [μm]
 extern double particle_VP[zbin+1][MAX_CONDENSIBLES];  // Particle volume [cm³]
 extern double particle_mass[zbin+1][MAX_CONDENSIBLES];  // Particle mass [kg]

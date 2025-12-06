@@ -11,6 +11,7 @@
 #include "routine.h"
 #include "global_temp.h"
 #include "nrutil.h"
+#include "ms_functions.h"
 
 // ** Declear global variables that are needed for other c files **
 // --- Atmospheric structure arrays ---
@@ -68,7 +69,7 @@ int ReactionR[NKin+1][7], ReactionM[NKinM+1][5], ReactionP[NPho+1][9], ReactionT
 int numr=0, numm=0, numt=0, nump=0, numx=0, numc=0, numf=0, numa=0, waternum=0, waterx=0; // Reaction counters
 
 // --- Atmospheric composition arrays [layer][species] ---
-double xx[zbin+1][NSP+1]; // Mixing ratios
+double xx[zbin+1][NSP+1]; // Number density for each layer each species
 double clouds[zbin+1][NSP+1] = {0.0}; // Cloud abundances (molecules/cm³)
 
 // --- Temperature and pressure arrays [layer] ---
@@ -88,6 +89,7 @@ double SMeanN2H2CIA[zbin+1], SMeanN2N2CIA[zbin+1], SMeanCO2CO2CIA[zbin+1];
 
 // --- Cloud physics arrays [layer][condensible] ---
 double particle_r2[zbin+1][MAX_CONDENSIBLES]; // Volume-weighted radius [μm]
+double particle_r1[zbin+1][MAX_CONDENSIBLES]; // Surface-area-weighted radius [μm] (for cloud optics)
 double particle_r0[zbin+1][MAX_CONDENSIBLES]; // Mode radius (nucleation/monomer radius) [μm]
 double particle_VP[zbin+1][MAX_CONDENSIBLES]; // Particle volume [cm³]
 double particle_mass[zbin+1][MAX_CONDENSIBLES]; // Particle mass [kg]
@@ -136,6 +138,9 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
     // old comment: THETAREF = 1.0471;//markus2021 
     
     // Print some info
+    printf("%s\n",fillmi);
+    printf("%s\n", "EPACRIS Cloud v0.1 (updated by Mantas Zilinskas)");
+    printf("%s\n",fillmi);
     printf("%s %s\n", "Run name: ",IN_FILE_NAME);
     printf("%s %s\n", "Results Directory: ",OUT_DIR);
     printf("%s\n",fillmi);
@@ -913,11 +918,11 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
         for (i=0; i<NLAMBDA; i++) {
             // Always initialize all arrays, but only the active one will be used
             cH2O[j][i] = 0.0;
-            aH2O[j][i] = 1.0;
+            aH2O[j][i] = 0.0;
             gH2O[j][i] = 0.0;
             
             cNH3[j][i] = 0.0;
-            aNH3[j][i] = 1.0;
+            aNH3[j][i] = 0.0;
             gNH3[j][i] = 0.0;
         }
     }
@@ -954,6 +959,7 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
     strcat(outrcdiag,"/Diagnostic_RC.dat"); //ms2021: "/" removed
     strcpy(outcondiag,dirroute);
     strcat(outcondiag,"/Diagnostic_condens.dat"); //ms2021: "/" removed
+
     
     // Copy config file to output directory
     char config_outfile[1024];
@@ -985,10 +991,11 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
     }
     
     printf("%s\n",fillmi); 
+    printf("%s\n\n",fillmi); 
+    printf("******************************************\n"); 
+    printf("*** Running radiative-covective solver ***\n********* Sit back and enjoy :) **********\n");
     printf("%s\n",fillmi); 
-    printf("=== Running radiative-covective solver ===\n========= Sit back and enjoy :) ==========\n");
-    printf("%s\n",fillmi); 
-    printf("%s\n",fillmi); 
+    printf("%s\n\n",fillmi); 
     // Start timing for radiative solver
     if(RadConv_Solver == 0) GreyTemp(P,outnewtemp,TINTSET); 
     

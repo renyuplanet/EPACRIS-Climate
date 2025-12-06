@@ -14,6 +14,7 @@
 #include <math.h>
 #include "constant.h"
 #include <stdio.h>
+#include <string.h>
 #include "config.h"
 #include "global_temp.h"
 #include "nrutil.h"
@@ -182,10 +183,37 @@ void ms_RadTrans(double Rflux[], double tempbnew[], double P[], int ncl, int isc
 //    fp=fopen("AuxillaryOut/checkemission.dat","w");
 //    fopa=fopen("AuxillaryOut/checkopacity.dat","w");
 
-
 //========================================================    
 //====== Wavelength loop =================================	
 	//DEBUGGprintf("%s\t%d\n","NLAMBDA ",NLAMBDA);
+        
+#if CLOUD_DEBUG_RT
+        // Accumulators for albedo diagnostics (per layer, per spectral region)
+        // Spectral regions: UV (<400nm), Visible (400-700nm), Near-IR (700-2000nm), Mid-IR (2000-10000nm), Far-IR (>10000nm)
+        typedef struct {
+            double sum_aH2O, sum_aNH3;
+            double sum_wa_clouds, sum_ws_clouds;  // Total absorption and scattering from clouds
+            double sum_wa_without_clouds, sum_ws_without_clouds;  // Total absorption and scattering without clouds
+            double sum_w_without_clouds, sum_w_with_clouds;  // Single scattering albedo with/without clouds
+            int count;
+        } CloudStats;
+        
+        CloudStats cloud_stats[zbin+1][5];  // [layer][spectral_region]
+        for (j=1; j<=zbin; j++) {
+            for (int reg=0; reg<5; reg++) {
+                cloud_stats[j][reg].sum_aH2O = 0.0;
+                cloud_stats[j][reg].sum_aNH3 = 0.0;
+                cloud_stats[j][reg].sum_wa_clouds = 0.0;
+                cloud_stats[j][reg].sum_ws_clouds = 0.0;
+                cloud_stats[j][reg].sum_wa_without_clouds = 0.0;
+                cloud_stats[j][reg].sum_ws_without_clouds = 0.0;
+                cloud_stats[j][reg].sum_w_without_clouds = 0.0;
+                cloud_stats[j][reg].sum_w_with_clouds = 0.0;
+                cloud_stats[j][reg].count = 0;
+            }
+        }
+#endif
+        
         for (i=0; i<(NLAMBDA-1); i++) {
 //	for (i=0; i<1; i++) {
 //========================================================    
@@ -254,25 +282,33 @@ void ms_RadTrans(double Rflux[], double tempbnew[], double P[], int ncl, int isc
             //ws[j] += crossa[2][i]*xx[j1][111]*256.0/mole2dust*sinab[2][i]; */
            
             // --- Cloud opacities and albedos ---     
-            // cH2O is already multiplied by number density (particles/m³)
+            // cH2O is already multiplied by number density
             // and is in units of cm^-1 (extinction coefficient), so no need to adjust
             // *** Assymetry factor (g) is below 30 lines below ***
 
             // ADD SPECIES HERE
-            // Absorption: extinction × (1 - albedo)
+
+            // Absorption wa: extinction × (1 - albedo)
+            // Scattering ws: extinction × albedo
             // H2O
-            wa[j] += cH2O[j1][i]*(1.0-aH2O[j1][i]);
+            double ws_H2O_cloud = cH2O[j1][i]*aH2O[j1][i]; // only the albedo is scattered
+            double wa_H2O_cloud = cH2O[j1][i]*(1.0-aH2O[j1][i]); //portion is reflected
+            wa[j] += wa_H2O_cloud;
+            ws[j] += ws_H2O_cloud;
             // NH3
-            wa[j] += cNH3[j1][i]*(1.0-aNH3[j1][i]); //portion is reflected with albedo
+            double ws_NH3_cloud = cNH3[j1][i]*aNH3[j1][i];
+            double wa_NH3_cloud = cNH3[j1][i]*(1.0-aNH3[j1][i]); // cNH3 should be zero if cloud density is zero
+            wa[j] += wa_NH3_cloud;
+            ws[j] += ws_NH3_cloud;
 
-            // Scattering: extinction × albedo
-            // H2O
-            ws[j] += cH2O[j1][i]*aH2O[j1][i];
-            // NH3
-            ws[j] += cNH3[j1][i]*aNH3[j1][i];
+            // Calculate cloud contributions BEFORE adding to total
+            double ws_before_clouds = ws[j] - ws_H2O_cloud - ws_NH3_cloud;
+            double wa_before_clouds = wa[j] - wa_H2O_cloud - wa_NH3_cloud;
+            double ws_total_clouds = ws_H2O_cloud + ws_NH3_cloud;
+            double wa_total_clouds = wa_H2O_cloud + wa_NH3_cloud;
+            double c_total_clouds = cH2O[j1][i] + cNH3[j1][i];
 
-
-            // Calculate single scattering albedo w
+            // Calculate single scattering albedo w (final value used in radiative transfer)
             if (ws[j] > 0.0) {
                 w[j]  = ws[j]/(wa[j]+ws[j]);
             } else {
@@ -286,6 +322,37 @@ void ms_RadTrans(double Rflux[], double tempbnew[], double P[], int ncl, int isc
             if (w[j] < 0.0000000000001) {
                 w[j] = 0.0000000000001;
             }
+            
+#if CLOUD_DEBUG_RT
+            // Accumulate statistics for albedo diagnostics across spectral regions
+            // Accumulate ALL cloud data regardless of thresholds (after w[j] is calculated)
+            if (c_total_clouds > 0.0) {
+                double wavelength_nm = wavelength[i];
+                
+                // Calculate single scattering albedo without clouds
+                double w_without_clouds = (wa_before_clouds + ws_before_clouds > 0.0) ? 
+                                         ws_before_clouds/(wa_before_clouds+ws_before_clouds) : 0.0;
+                
+                // Determine spectral region: 0=UV, 1=Visible, 2=Near-IR, 3=Mid-IR, 4=Far-IR
+                int region = 4;  // Default to Far-IR
+                if (wavelength_nm < 400) region = 0;
+                else if (wavelength_nm < 700) region = 1;
+                else if (wavelength_nm < 2000) region = 2;
+                else if (wavelength_nm < 10000) region = 3;
+                
+                // Accumulate cloud data including final w[j]
+                CloudStats *stats = &cloud_stats[j][region];
+                stats->sum_aH2O += aH2O[j1][i];
+                stats->sum_aNH3 += aNH3[j1][i];
+                stats->sum_wa_clouds += wa_total_clouds;
+                stats->sum_ws_clouds += ws_total_clouds;
+                stats->sum_wa_without_clouds += wa_before_clouds;
+                stats->sum_ws_without_clouds += ws_before_clouds;
+                stats->sum_w_without_clouds += w_without_clouds;
+                stats->sum_w_with_clouds += w[j];  // Final w[j] value used in radiative transfer
+                stats->count++;
+            }
+#endif
 
             //ms:HELIOS GJ1214 Comparison:
             //w[j] = 0.5;
@@ -381,6 +448,90 @@ void ms_RadTrans(double Rflux[], double tempbnew[], double P[], int ncl, int isc
 //========================================================    
 //========================================================   
 //DEBUGG    printf("%s\n","Wavelength-loop DONE");
+
+#if CLOUD_DEBUG_RT
+    // Print accumulated albedo diagnostics once per NRT_RC steps
+    // Summarizes all layers with clouds across spectral regions
+    static int last_printed_rt_step = -1;
+    const char *region_names[] = {"UV (<400nm)", "Visible (400-700nm)", "Near-IR (700-2000nm)", "Mid-IR (2000-10000nm)", "Far-IR (>10000nm) "};
+    
+    // Print summary every NRT_RC steps (after convective adjustment cycles)
+    // Use static flag to ensure it only prints once per RT step value
+    if (RTstepcount % NRT_RC == 0 && RTstepcount > 0 && RTstepcount != last_printed_rt_step) {
+        last_printed_rt_step = RTstepcount;
+        int layers_with_clouds = 0;
+        
+        // First pass: count layers with cloud data
+        for (j=1; j<=zbin; j++) {
+            int has_data = 0;
+            for (int reg=0; reg<5; reg++) {
+                if (cloud_stats[j][reg].count > 0) {
+                    has_data = 1;
+                    break;
+                }
+            }
+            if (has_data) layers_with_clouds++;
+        }
+        
+        // Print summary for all layers with clouds
+        if (layers_with_clouds > 0) {
+            printf("\n--- CLOUD ALBEDO SUMMARY (RT step %d, after %d convective adjustments) ---\n", 
+                   RTstepcount, RTstepcount / NRT_RC);
+            printf("Layers with clouds: %d\n", layers_with_clouds);
+            printf("Values are averaged over spectral bands");
+            
+            for (j=1; j<=zbin; j++) {
+                int j1 = zbin+1-j;
+                int has_any_data = 0;
+                
+                // Check if this layer has any cloud data
+                for (int reg=0; reg<5; reg++) {
+                    if (cloud_stats[j][reg].count > 0) {
+                        has_any_data = 1;
+                        break;
+                    }
+                }
+                
+                // Print summary for this layer
+                if (has_any_data) {
+                    printf("\n  Layer %d:\n", j1);
+                    for (int reg=0; reg<5; reg++) {
+                        CloudStats *stats = &cloud_stats[j][reg];
+                        if (stats->count > 0) {
+                            double avg_aH2O = stats->sum_aH2O / stats->count;
+                            double avg_aNH3 = stats->sum_aNH3 / stats->count;
+                            double avg_wa_clouds = stats->sum_wa_clouds / stats->count;
+                            double avg_ws_clouds = stats->sum_ws_clouds / stats->count;
+                            double avg_wa_without = stats->sum_wa_without_clouds / stats->count;
+                            double avg_ws_without = stats->sum_ws_without_clouds / stats->count;
+                            double avg_w_without = stats->sum_w_without_clouds / stats->count;
+                            double avg_w_with = stats->sum_w_with_clouds / stats->count;
+                            double avg_w_change = avg_w_with - avg_w_without;  // Calculate from final w[j] values
+                            
+                            printf("    %s:\n", region_names[reg]);
+                            printf("      Total opacity without clouds: wa=%.2e cm⁻¹, ws=%.2e cm⁻¹\n", 
+                                   avg_wa_without, avg_ws_without);
+                            printf("      Cloud opacity: wa_clouds=%.2e cm⁻¹, ws_clouds=%.2e cm⁻¹\n", 
+                                   avg_wa_clouds, avg_ws_clouds);
+                            printf("      Single scattering albedo: w_without_clouds=%.4f, w_with_clouds=%.4f, change=%.4f\n",
+                                   avg_w_without, avg_w_with, avg_w_change);
+                            printf("      Cloud albedos: aH2O=%.4e, aNH3=%.4e\n",
+                                   avg_aH2O, avg_aNH3);
+                        }
+                    }
+                }
+            }
+            printf("----------------------------------------------------------------------\n");
+        }
+        
+        // Reset stats for next RT step
+        for (j=1; j<=zbin; j++) {
+            for (int reg=0; reg<5; reg++) {
+                memset(&cloud_stats[j][reg], 0, sizeof(CloudStats));
+            }
+        }
+    }
+#endif
 
     // Calculate TOA incoming stellar flux (matches 2-stream solver: muD[1]*ffrac[1]*solar = FADV*solar)
     for (i=0; i<(NLAMBDA-1); i++) {
@@ -657,14 +808,14 @@ if (TS_SCHEME == 1){
         double internal_flux = SIGMA * pow(Tint, 4.0);
         double energy_balance = radiationO - absorbed_stellar - internal_flux;
         
-        printf("=======================================================\n");
+        printf("----------------------------------------------------------------------\n");
         printf("Diagnostic from the ms_radtrans_test.c file:\n");
         printf("Energy Balance Check:\n");
         printf("  Absorbed stellar:     %.2e W/m2\n", absorbed_stellar);
         printf("  Internal heat:        %.2e W/m2\n", internal_flux);
         printf("  TOA net outgoing:     %.2e W/m2\n", radiationO);
         printf("  Energy imbalance:     %.2e W/m2\n", energy_balance);
-        printf("=======================================================\n");
+        printf("----------------------------------------------------------------------\n");
     }
     
     // Return radiation flux values for diagnostics

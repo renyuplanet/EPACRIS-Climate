@@ -5,8 +5,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Get all the files in the Results directory
-results_dir = 'Results/K2-18b/'
-cases = ['cloud_test_off_rad_new_test_10', 'cloud_test_on_rad_new_test_10']
+results_dir = '../Results/K2-18b/'
+cases = ['cloud_test_0.1_off_50', 'cloud_test_0.1_on_50']
 tp_file_extension = 'NewTemperature.dat'
 
 # Plot the TP profiles
@@ -26,5 +26,5 @@ plt.yscale('log')
 plt.ylim(1e-8, 1e3)
 plt.gca().invert_yaxis()
 plt.grid(False)
-plt.savefig('TP_profile_new5_test_diff.png')
+plt.savefig('Output/TP_cloud_compare_0.1.png')
 #plt.show()

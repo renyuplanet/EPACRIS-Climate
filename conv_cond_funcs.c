@@ -9,6 +9,7 @@
 #include "condensed_heat.h"  // Include condensed heat capacity functions
 #include "ms_gasheat.h"  // Include gas-phase heat capacity functions
 #include "conv_cond_funcs.h"  // Include function declarations
+#include "ms_functions.h"
 
 //--------------------------------------------------------------------- 
 /* Forward declarations */
@@ -1097,6 +1098,7 @@ void cloud_redistribution_none(double gravity, double P[]) {
             // Skip if no condensate in this layer - reset particle size
             if (clouds[layer][species_id] < 1.0e-20) {
                 particle_r2[layer][i] = 0.0;  // Reset when condensation stops
+                particle_r1[layer][i] = 0.0;
                 particle_r0[layer][i] = 0.0;
                 particle_VP[layer][i] = 0.0;
                 particle_mass[layer][i] = 0.0;
@@ -1125,6 +1127,7 @@ void cloud_redistribution_none(double gravity, double P[]) {
             // Store multiple particle properties for potential use elsewhere
             // All values calculated once in particlesizef_local and stored for reuse
             particle_r2[layer][i] = r2;              // r2: volume-weighted radius [μm]
+            particle_r1[layer][i] = r1;             // r1: surface-area-weighted radius [μm] (for cloud optics)
             particle_r0[layer][i] = r0;             // r0: nucleation/monomer radius [μm]
             particle_VP[layer][i] = VP;             // VP: particle volume [cm³]
             particle_mass[layer][i] = mass_per_particle; // mass per particle [kg]
@@ -1507,9 +1510,9 @@ void detect_condensibles_atmosphere() {
         if (is_condensible_anywhere && detected_count < MAX_CONDENSIBLES) {
             detected_condensibles[detected_count] = species_id;
             detected_count++;
-            printf("=======================================================\n");
+            printf("%s\n",fillmi); 
             printf("Species %d (%s) detected as condensible\n", species_id, get_species_name(species_id));
-            printf("=======================================================\n");
+            printf("%s\n",fillmi); 
         }
     }
     
@@ -2141,7 +2144,7 @@ void exponential_cloud(double gravity, double P[], double **particle_number_dens
         }
     }
     
-    printf("=== HYBRID A&M + HU+2019 + MS_ADIABAT CLOUD DISTRIBUTION COMPLETE ===\n");
+    printf("--- HYBRID A&M + HU+2019 + MS_ADIABAT CLOUD DISTRIBUTION COMPLETE ---\n");
 }
 
 
