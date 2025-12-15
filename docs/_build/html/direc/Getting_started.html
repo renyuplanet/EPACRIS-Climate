@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting started &mdash; EPACRIS-cloud 0.1 documentation</title>
+  <title>Getting started &mdash; EPACRIS-Climate Cloud 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
 
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Configuration file" href="Configuration_file.html" />
-    <link rel="prev" title="About" href="About.html" /> 
+    <link rel="prev" title="EPACRIS-Climate Cloud v0.1 Documentation" href="../About.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -31,8 +31,8 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            EPACRIS-cloud
+          <a href="../About.html" class="icon icon-home">
+            EPACRIS-Climate Cloud
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -44,11 +44,20 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="About.html">About</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-a-simple-case">Setting up a simple case</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-the-model">Running the model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reading-output-files">Reading output files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#main-output-files">Main output files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-file">Configuration file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#live-plots-if-enabled">Live plots (if enabled)</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="Configuration_file.html">Configuration file</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code_structure.html">Code structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 </ul>
 
@@ -58,14 +67,14 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">EPACRIS-cloud</a>
+          <a href="../About.html">EPACRIS-Climate Cloud</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li><a href="../About.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Getting started</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/direc/Getting_started.rst.txt" rel="nofollow"> View page source</a>
@@ -78,14 +87,171 @@
              
   <section id="getting-started">
 <h1>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
-<p>Instructions on installing and running EPACRIS…</p>
+<p>This guide provides step-by-step instructions for setting up and running EPACRIS.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
+<p>Before running EPACRIS, ensure you have downloaded the opacities and Mie tables using this <a class="reference external" href="https://zenodo.org/records/17888800">link</a>.</p>
+<p>Make sure you have:</p>
+<ul class="simple">
+<li><p>A C compiler (e.g., <code class="docutils literal notranslate"><span class="pre">gcc</span></code>)</p></li>
+<li><p>Opacity and Mie tables directory setup from the above download link</p></li>
+<li><p>(If using live plotting) Python 3 with the following libraries: <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, and <code class="docutils literal notranslate"><span class="pre">pandas</span></code></p></li>
+</ul>
+</section>
+<section id="setting-up-a-simple-case">
+<h2>Setting up a simple case<a class="headerlink" href="#setting-up-a-simple-case" title="Link to this heading"></a></h2>
+<p>The parameters here are for a high albedo K2-18 b case using a H-N-C-O-S network and increased 10x solar metallicity.</p>
+<p>All configuration is done through the <code class="docutils literal notranslate"><span class="pre">config.h</span></code> file in the root directory. The config setup is copied to the output location for each run. The following steps explain key parameters for a simple setup. For a complete parameter reference, see the <a class="reference internal" href="Configuration_file.html"><span class="doc">Configuration file</span></a> section.</p>
+<p><strong>Step 1: Set output directory and run name</strong></p>
+<p>At the top of <code class="docutils literal notranslate"><span class="pre">config.h</span></code>, set the run name and output directory:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define IN_FILE_NAME &quot;K2-18b&quot;           </span><span class="c1">// Run identifier</span>
+<span class="cp">#define OUT_DIR &quot;Results/K2-18b/&quot;      </span><span class="c1">// Output directory is created automatically</span>
+</pre></div>
+</div>
+<p><strong>Step 2: Choose opacity species</strong></p>
+<p>Set the opacity species list you want to include:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define OPACITY_SPECIES_LIST \</span>
+<span class="cp">    &quot;H2O&quot;, &quot;NH3&quot;, &quot;CO2&quot;, &quot;CO&quot;, &quot;CH4&quot;, \</span>
+<span class="cp">    &quot;H2S&quot;, &quot;N2&quot;, &quot;OH&quot;, &quot;C2H6&quot;, &quot;CH2O2&quot;, \</span>
+<span class="cp">    &quot;HNO3&quot;, &quot;N2O&quot;, &quot;SO2&quot;, &quot;NO2&quot;, &quot;NO&quot;, \</span>
+<span class="cp">    &quot;O2&quot;, &quot;O3&quot;, &quot;OCS&quot;, &quot;HCN&quot;, &quot;HO2&quot;, \</span>
+<span class="cp">    &quot;C2H2&quot;, &quot;C2H4&quot;, &quot;H2CO&quot;, &quot;H2O2&quot;</span>
+</pre></div>
+</div>
+<p>Currently, CIA opacities are hardcoded in the readcia.c file and can be added or removed there.</p>
+<p>Set the directory where opacity files are located, these can be downloaded <a class="reference external" href="https://zenodo.org/records/17888800">here</a>.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define CROSSHEADING &quot;../Opacity/main_opacities/&quot;</span>
+</pre></div>
+</div>
+<p>If adding your own line-by-line opacities, ensure opacity files exist for each species in the format <code class="docutils literal notranslate"><span class="pre">opac&lt;SPECIES&gt;.dat</span></code> (e.g., <code class="docutils literal notranslate"><span class="pre">opacH2O.dat</span></code>, <code class="docutils literal notranslate"><span class="pre">opacNH3.dat</span></code>). The format of opacities is explained in the <a class="reference internal" href="Code_structure.html"><span class="doc">Code structure</span></a> section.</p>
+<p><strong>Step 3: Configure cloud physics</strong></p>
+<p>If you want to include cloud microphysics and Mie scattering, enable the <code class="docutils literal notranslate"><span class="pre">INCLUDE_CLOUD_PHYSICS</span></code> flag and set the <code class="docutils literal notranslate"><span class="pre">USE_EPACRIS_FORMAT</span></code> to <code class="docutils literal notranslate"><span class="pre">1</span></code> for the default EPACRIS Mie table format or <code class="docutils literal notranslate"><span class="pre">0</span></code> for the LX-Mie format. <code class="docutils literal notranslate"><span class="pre">INCLUDE_CLOUD_PHYSICS</span> <span class="pre">1</span></code> is recommended for a self-consistent model. Included molecule IDs in <code class="docutils literal notranslate"><span class="pre">CLOUD_SPECIES_LIST</span></code> will tell the code which condensed species to process for cloud microphysics, while <code class="docutils literal notranslate"><span class="pre">KZZ</span></code> will impact cloud particle sizes. Note, chemical species in EPACRIS are referenced with integer IDs, which are determined in the species file such as <code class="docutils literal notranslate"><span class="pre">Library/SpeciesList/species_HNCSO.dat</span></code> in the <code class="docutils literal notranslate"><span class="pre">Standard</span> <span class="pre">Number</span></code> column.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define INCLUDE_CLOUD_PHYSICS 1  </span><span class="c1">// 0 = no clouds, 1 = clouds without redistribution, 2 = clouds with redistribution</span>
+<span class="cp">#define USE_EPACRIS_FORMAT 1     </span><span class="c1">//  Mie tables format: 0 = LX-Mie (HELIOS) format, 1 = EPACRIS format</span>
+<span class="cp">#define CLOUD_MIE_DIRECTORY_EPACRIS &quot;../Opacity/Clouds/EPACRIS_MIE&quot;</span>
+<span class="cp">#define CLOUD_SPECIES_LIST 7, 9  </span><span class="c1">// Species IDs: 7=H2O, 9=NH3, 20=CO, 21=CH4, 52=CO2, etc.</span>
+<span class="cp">#define KZZ 1.0E+8               </span><span class="c1">// cm²/s (eddy diffusion coefficient); affects cloud particle sizes</span>
+</pre></div>
+</div>
+<p>Mie folder structure for the EPACRIS format should follow <code class="docutils literal notranslate"><span class="pre">EPACRIS_MIE/H2O/</span></code>, <code class="docutils literal notranslate"><span class="pre">EPACRIS_MIE/NH3/</span></code>, etc. with the folders containing the files <code class="docutils literal notranslate"><span class="pre">Albedo.dat</span></code>, <code class="docutils literal notranslate"><span class="pre">Cross.dat</span></code>, <code class="docutils literal notranslate"><span class="pre">Geo.dat</span></code>.</p>
+<p>For LX-Mie format, the folder structure should follow <code class="docutils literal notranslate"><span class="pre">LXMieOuput/H2O/</span></code>, <code class="docutils literal notranslate"><span class="pre">LXMieOuput/NH3/</span></code> and should contain output files <code class="docutils literal notranslate"><span class="pre">r0.010000.dat</span></code>, <code class="docutils literal notranslate"><span class="pre">r0.012589.dat</span></code>, <code class="docutils literal notranslate"><span class="pre">r0.015849.dat</span></code>, etc., as described in the  <a class="reference external" href="https://heliosexo.readthedocs.io/en/latest/sections/tutorial.html#including-clouds">HELIOS documentation</a></p>
+<p><strong>Step 4: Set planet and stellar properties</strong></p>
+<p>Set the usual planet parameters (planet mass, radius, semi-major axis).</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define MASS_PLANET 5.15401e+25     </span><span class="c1">// kg (planet mass)</span>
+<span class="cp">#define RADIUS_PLANET 1.66470e+07   </span><span class="c1">// m (planet radius)</span>
+<span class="cp">#define ORBIT 0.1120                </span><span class="c1">// AU (semi-major axis)</span>
+</pre></div>
+</div>
+<p>Assign the location of the stellar spectrum file and adjust stellar properties. If required, adjust the <code class="docutils literal notranslate"><span class="pre">FaintSun</span></code> parameter to reduce the incoming stellar flux, mimicking albedo:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define STAR_SPEC &quot;Library/Star/gj876.txt&quot;  </span><span class="c1">// Path to stellar spectrum file</span>
+<span class="cp">#define STAR_RADIUS 0.44                    </span><span class="c1">// Solar radius</span>
+<span class="cp">#define STAR_TEMP 3457                      </span><span class="c1">// K (stellar effective temperature)</span>
+<span class="cp">#define FaintSun 0.3                        </span><span class="c1">// (1 - albedo) factor</span>
+</pre></div>
+</div>
+<p>The stellar spectrum file should contain two columns: wavelength (nm) and flux (W/m²/nm at 1 AU).</p>
+<p><strong>Step 5: Set the chemistry mode and relevant paths</strong></p>
+<p>Set the chemistry mode to <code class="docutils literal notranslate"><span class="pre">IMODE</span> <span class="pre">0</span></code> for chemical equilibrium. Otherwise, a different value can be chosen, such as <code class="docutils literal notranslate"><span class="pre">IMODE</span> <span class="pre">1</span></code>, to import a predetermined molecular composition from the species list file (see the <a class="reference internal" href="Configuration_file.html"><span class="doc">Configuration file</span></a> section for a full explanation of this parameter). The relevant paths for the elemental budget and molecular species list can also be set here.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define IMODE 0</span>
+<span class="cp">#define ELE_ABUN &quot;Library/elemental_abundance_files/new_x10Solar.dat&quot; </span><span class="c1">// Elemental budget file</span>
+<span class="cp">#define SPECIES_LIST &quot;Library/SpeciesList/species_HNCSO.dat&quot; </span><span class="c1">// Molecular species list</span>
+</pre></div>
+</div>
+<p><strong>Step 6: Set advection and internal heat flux</strong></p>
+<p>Don’t forget to adjust heat redistribution and slant path angle of incoming flux, as well as the internal heat flux.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define FADV 0.25          </span><span class="c1">// Advection factor (0.25 = uniformly distributed, 0.6667 = no advection)</span>
+<span class="cp">#define THETAANGLE 0.      </span><span class="c1">// Slant path angle in degrees (60 = global average, 30 = hemispheric)</span>
+<span class="cp">#define TINTSET 50.0       </span><span class="c1">// Internal heat flux temperature (K)</span>
+</pre></div>
+</div>
+</section>
+<section id="running-the-model">
+<h2>Running the model<a class="headerlink" href="#running-the-model" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p>Ensure all required data files are in place:</p>
+<ul class="simple">
+<li><p>Opacity files in <code class="docutils literal notranslate"><span class="pre">Opacity/main_opacities/</span></code></p></li>
+<li><p>Mie tables in <code class="docutils literal notranslate"><span class="pre">Opacity/Clouds/EPACRIS_MIE/</span></code> or <code class="docutils literal notranslate"><span class="pre">Opacity/Clouds/LXMieOuput/</span></code></p></li>
+</ul>
+</li>
+<li><p>Edit <code class="docutils literal notranslate"><span class="pre">config.h</span></code> with your planet parameters (see above).</p></li>
+<li><p>Compile the code:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gcc<span class="w"> </span>epacris_main.c<span class="w"> </span>-lm<span class="w"> </span>-o<span class="w"> </span>epacris
+</pre></div>
+</div>
+</li>
+<li><p>Run the executable from the EPACRIS root directory:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./epacris
+</pre></div>
+</div>
+</li>
+</ol>
+<p>The model will:</p>
+<ul class="simple">
+<li><p>Print initialization information to the terminal</p></li>
+<li><p>Create the output directory if it doesn’t exist</p></li>
+<li><p>Copy <code class="docutils literal notranslate"><span class="pre">config.h</span></code> to the output directory as <code class="docutils literal notranslate"><span class="pre">config_&lt;IN_FILE_NAME&gt;.txt</span></code></p></li>
+<li><p>Write output files to the output directory</p></li>
+<li><p>(If enabled) Generate live debugging plots in <code class="docutils literal notranslate"><span class="pre">&lt;OUT_DIR&gt;/live_plot/</span></code></p></li>
+</ul>
+</section>
+<section id="reading-output-files">
+<h2>Reading output files<a class="headerlink" href="#reading-output-files" title="Link to this heading"></a></h2>
+<p>The model generates several output files in the <code class="docutils literal notranslate"><span class="pre">OUT_DIR</span></code> directory:</p>
+<section id="main-output-files">
+<h3>Main output files<a class="headerlink" href="#main-output-files" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>NewTemperature.dat</strong>: Final temperature-pressure profile</p>
+<ul>
+<li><p>Columns: Layer number, Altitude (km), Pressure (log10(Pa)) Temperature (K)</p></li>
+</ul>
+</li>
+<li><p><strong>ConcentrationSTD_T.dat</strong>: Final atmospheric composition</p>
+<ul>
+<li><p>Columns: Altitude grids (km), Temperature (K), Pressure (log10(Pa)), Species mixing ratios (one column per species ID)</p></li>
+</ul>
+</li>
+<li><p><strong>Diagnostic_RT.dat</strong>: Radiative transfer diagnostics</p>
+<ul>
+<li><p>Contains energy balance information</p></li>
+</ul>
+</li>
+<li><p><strong>Diagnostic_RC.dat</strong>: Radiative-convective diagnostics</p>
+<ul>
+<li><p>Contains information about convective adjustment and cloudy layers</p></li>
+</ul>
+</li>
+<li><p><strong>Diagnostic_condens.dat</strong>: Condensation diagnostics (if clouds enabled) [testing]</p>
+<ul>
+<li><p>Contains cloud information such as particle sizes and number densities</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="configuration-file">
+<h3>Configuration file<a class="headerlink" href="#configuration-file" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>config_&lt;IN_FILE_NAME&gt;.txt</strong>: Copy of <code class="docutils literal notranslate"><span class="pre">config.h</span></code> used for the run</p>
+<ul>
+<li><p>Useful for reproducing results and tracking parameter settings</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="live-plots-if-enabled">
+<h3>Live plots (if enabled)<a class="headerlink" href="#live-plots-if-enabled" title="Link to this heading"></a></h3>
+<p>If <code class="docutils literal notranslate"><span class="pre">LIVE_PLOTTING</span> <span class="pre">=</span> <span class="pre">1</span></code>, the model generates temperature-pressure profile evolution plots with other diagnostic information in <code class="docutils literal notranslate"><span class="pre">&lt;OUT_DIR&gt;/live_plot/</span></code>. To adjust live plot formatting, edit the <code class="docutils literal notranslate"><span class="pre">Tools/live_plot.py</span></code> script.</p>
+<p>For more detailed information about all the configuration parameters, see the <a class="reference internal" href="Configuration_file.html"><span class="doc">Configuration file</span></a> section.
+For a general description of the code structure and functionality, see the <a class="reference internal" href="Code_structure.html"><span class="doc">Code structure</span></a> section.</p>
+</section>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="About.html" class="btn btn-neutral float-left" title="About" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../About.html" class="btn btn-neutral float-left" title="EPACRIS-Climate Cloud v0.1 Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="Configuration_file.html" class="btn btn-neutral float-right" title="Configuration file" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

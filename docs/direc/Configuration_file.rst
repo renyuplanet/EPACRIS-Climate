@@ -1,4 +1,146 @@
 Configuration file
-==================
+===================
 
-Describe config.h, input files, parameters...
+This section describes all configuration parameters in ``config.h``.
+
+Output directory and name
+-------------------------
+
+* **IN_FILE_NAME**: Run identifier string used for output file naming and directory organization. This name appears in output filenames and is copied to the output directory.
+
+* **OUT_DIR**: Output directory path where all results will be written. The directory is created automatically if it doesn't exist. The config file is copied here as ``config_<IN_FILE_NAME>.txt`` for reproducibility.
+
+Opacity configuration
+---------------------
+
+* **OPACITY_SPECIES_LIST**: Comma-separated list of molecular species names (as strings) for which opacity files will be read. Each species listed here must have a corresponding opacity file ``opac<SPECIES>.dat`` in the opacity directory. Example: ``"H2O", "NH3", "CO2"``.
+
+* **CROSSHEADING**: Directory path where line-by-line opacity files are located. Opacity files should be named ``opac<SPECIES>.dat`` (e.g., ``opacH2O.dat``, ``opacNH3.dat``). The path is relative to the root directory where the executable is run. The format of the opacities used in EPACRIS is described in the :doc:`Code_structure` section.
+
+Cloud physics & condensation configuration
+------------------------------------------
+
+* **INCLUDE_CLOUD_PHYSICS**: Enable or disable cloud microphysics and radiative effects. Set to ``0`` for no clouds, ``1`` for sel-consistent cloud distribution controlled by condensation in each layer, or ``2`` for clouds with an exponential decay with altitude (experimental). Mode ``1`` is recommended for most runs.
+
+* **DELTA_P**: Supersaturation parameter used in cloud particle size calculations. This small positive value (``1.0e-12`` is used by default) provides numerical stability in the particle growth equations. An automatic DELTA_P mode for automatic determination is currently being implemented.
+
+* **CLOUD_DEBUG_MIE**: Enable detailed debugging output for Mie table reading and interpolation to the current cloud properties. Set to ``0`` to disable or ``1`` to print detailed information about Mie table interpolation, particle radius matching. Useful for troubleshooting cloud issues.
+
+* **CLOUD_DEBUG_RT**: Enable cloud albedo diagnostics in the radiative transfer module. Set to ``0`` to disable or ``1`` to print summaries of cloud albedo effects, single-scattering albedo changes, and cloud opacity contributions. Output is printed for every cloud layer only every ``NRT_RC`` steps to avoid terminal spam.
+
+* **ENABLE_COLD_TRAP**: Enable cold trap mechanism that limits vapor abundance above condensation regions. Set to ``0`` to disable or ``1`` to enable. When enabled, condensible species are depleted above their condensation level, simulating efficient removal by settling or rainout. Only affects condensible species.
+
+* **USE_EPACRIS_FORMAT**: Choose the format for cloud Mie scattering lookup tables. Set to ``0`` for LX-Mie format (as used in HELIOS) or ``1`` for EPACRIS format. EPACRIS format uses separate files (``Albedo.dat``, ``Cross.dat``, ``Geo.dat``) while LX-Mie uses radius-named files (``r0.010000.dat``, ``r0.012589.dat``, ``r0.015849.dat``, etc.).
+
+* **CLOUD_MIE_DIRECTORY_EPACRIS**: Base directory path for EPACRIS format Mie scattering tables. The directory structure should be ``<DIRECTORY>/<SPECIES_NAME>/`` (e.g., ``EPACRIS_MIE/H2O/``) containing ``Albedo.dat``, ``Cross.dat``, and ``Geo.dat`` files. See the :doc:`Code_structure` section for more details about the Mie table formatting.
+
+* **CLOUD_MIE_DIRECTORY_LXMIE**: Base directory path for LX-Mie format Mie scattering tables. The directory structure should be ``<DIRECTORY>/<SPECIES_NAME>/`` (e.g., ``LXMieOuput/H2O/``) containing radius-keyed files like ``r0.010000.dat``, ``r0.012589.dat``, etc. The formatting of LX-Mie tables follows the formatting as explained in the `HELIOS documentation <https://heliosexo.readthedocs.io/en/latest/sections/tutorial.html#including-clouds>`_.
+
+* **CLOUD_SPECIES_LIST**: Comma-separated list of species IDs that cloud physics will be processed for. Species IDs are integer values defined in the species list file (e.g., ``Library/SpeciesList/species_HNCSO.dat``). Common values: ``7`` for H2O, ``9`` for NH3, ``20`` for CO, ``21`` for CH4, ``52`` for CO2. Only species with available Mie tables should be included. (Automatic detection implementation is currently being developed)
+
+* **CONDENSATION_MODE**: Method for determining which species can condense. Set to ``0`` for manual mode (use predefined ``CONDENSIBLES_MANUAL`` list), ``1`` for automatic mode (dynamic detection based on saturation ratios), or ``2`` for hybrid mode (manual list with automatic validation). Mode ``1`` is recommended for most cases.
+
+* **CONDENSATION_TIMING**: When to detect condensible species during the calculation. Set to ``0`` to detect once before the radiative-convective iteration, ``1`` to detect every radiative-convective iteration, or ``2`` to detect before the loop and then every ``NRT_RC`` iterations. Mode ``2`` provides a good balance between accuracy and computational efficiency.
+
+* **MAX_CONDENSIBLES**: Maximum number of species that could potentially condense in automatic detection mode. This sets the size of internal arrays for tracking condensible species. Typical values range from 10 to 20 depending on the chemical network complexity.
+
+* **SATURATION_THRESHOLD**: Minimum saturation ratio (partial pressure / saturation vapor pressure) required to consider a species condensible in automatic detection mode. Species with saturation ratios above this threshold are added to the condensibles list. Default value is ``0.1`` (10% saturation).
+
+* **NCONDENSIBLES_MANUAL**: Number of condensible species in the manual list (used when ``CONDENSATION_MODE = 0`` or ``2``). Set to ``0`` if not using manual mode. Must match the number of entries in ``CONDENSIBLES_MANUAL``.
+
+* **CONDENSIBLES_MANUAL**: Array of species IDs for manual condensation mode. Only used when ``CONDENSATION_MODE = 0`` or ``2``. Format: ``(int[]){7, 9, 20}`` for H2O, NH3, CO. Common species IDs: H2O=7, NH3=9, CO=20, CH4=21, CO2=52, H2=53, O2=54, N2=55.
+
+* **ALPHA_RAINOUT**: Fraction of condensible material retained after rainout, following Graham et al. (2021) formulation. Value of ``1.0`` means 100% retention (no removal), ``0.0`` means complete removal. This is a single value applied to all condensible species. Typical values range from ``0.5`` to ``1.0``.
+
+* **ENABLE_COLD_TRAP_ALPHA**: Enable tracking of original abundance and calculation of alpha relative to the original value. Set to ``0`` to disable (use constant ``ALPHA_RAINOUT``) or ``1`` to enable dynamic alpha calculation based on original abundance before cold trapping. This allows alpha to vary with altitude and species.
+
+Rainout and material removal (experimental)
+-------------------------------------------
+
+* **RAINOUT_MODE**: Enable material removal (rainout) from the atmosphere. Set to ``0`` for no rainout, ``1`` for a single rainout event, or ``2`` for multiple rainout events. **Note: This feature is for future use and is currently will not work as intended.**
+
+* **RAINOUT_TRIGGER_ITERATION**: Radiative-convective iteration number at which to trigger a rainout event (when ``RAINOUT_MODE = 1`` or ``2``). The rainout removes condensible material below the condensation level based on the ``ALPHA_RAINOUT`` parameter.
+
+* **MAX_RAINOUT_EVENTS**: Maximum number of rainout events allowed when ``RAINOUT_MODE = 2``. This limits how many times material can be removed during a single model run.
+
+* **PRESSURE_CONSERVATION**: Method for handling pressure after rainout. Set to ``0`` for open system (readjust mole fractions, keep pressure constant) or ``1`` for realistic system (pressure adjusts).
+
+Live plotting and debugging
+---------------------------
+
+* **LIVE_PLOTTING**: Enable live plotting of temperature-pressure profile evolution and diagnostics. Set to ``0`` to disable or ``1`` to enable. When enabled, plots are generated in ``<OUT_DIR>/live_plot/`` directory using the Python script ``Tools/live_plot.py``. Requires Python 3 with matplotlib, numpy, and pandas.
+
+* **PRINT_ITER**: Number of radiative transfer steps between live plot updates. Lower values produce more frequent updates but slower execution. For matrix solver mode, this is automatically set to 1. Typical values range from 10 to 100. During the convective iteration, the diagnostics are plotted every step.
+
+Planet and stellar properties
+-----------------------------
+
+* **MASS_PLANET**: Planet mass in kilograms. Used to calculate surface gravity, which affects atmospheric structure, scale height, and cloud particle settling velocities. Typical values range from ``1e24`` kg (Earth-like) to ``1e27`` kg (Jupiter-like).
+
+* **RADIUS_PLANET**: Planet radius in meters. Combined with ``MASS_PLANET``, this determines surface gravity (g = GM/R²). Also affects the geometric factor for stellar flux absorption. Typical values range from ``6e6`` m (Earth-like) to ``7e7`` m (Jupiter-like).
+
+* **ORBIT**: Planet's semi-major axis in astronomical units (AU). Used to scale the stellar flux by ``1/ORBIT²``, accounting for the inverse-square law of radiation. Closer planets receive more stellar flux. Typical exoplanet values range from ``0.01`` AU (hot Jupiters) to ``10`` AU (cold planets).
+
+* **KZZ**: Eddy diffusion coefficient in cm²/s. Controls vertical mixing and turbulent transport in the atmosphere. Higher values lead to more mixing, smaller cloud particles (due to increased updraft), and broader vertical distributions. Typical values range from ``1e6`` to ``1e9`` cm²/s. This parameter significantly affects cloud microphysics and particle sizes.
+
+* **STAR_SPEC**: Path to the stellar spectrum file, relative to the root directory. The file should contain two columns: wavelength (nm) and flux (W/m²/nm at 1 AU). The flux is automatically scaled by ``1/ORBIT²`` and ``FaintSun``. Example: ``"Library/Star/gj876.txt"``.
+
+* **STAR_RADIUS**: Stellar radius in units of solar radius. Used for geometric calculations if needed. Typical values range from ``0.1`` (M-dwarfs) to ``10`` (giant stars). Default solar radius is ``6.96e8`` m.
+
+* **STAR_TEMP**: Stellar effective temperature in Kelvin. Used for blackbody calculations and flux scaling if needed. Typical values range from ``2500`` K (M-dwarfs) to ``10000`` K (A-stars). The actual spectrum should be provided in ``STAR_SPEC`` file.
+
+* **FaintSun**: Factor to reduce incoming stellar flux, mimicking planetary albedo or stellar evolution effects. Value of ``1.0`` means full flux absorption, ``0.3`` means only 30% of flux is absorbed (equivalent to 70% albedo). The flux is multiplied by this factor after orbital distance scaling. Typical values range from ``0.1`` to ``1.0``.
+
+Initial concentration setting
+------------------------------
+
+* **IMODE**: Method for setting initial atmospheric composition. Set to ``0`` for chemical equilibrium calculation (recommended), ``1`` to import from ``SPECIES_LIST`` file, ``2`` to import from previous calculation results, ``3`` for simplified chemical equilibrium formula, or ``4`` to import TP profile only for radiative calculations. Mode ``0`` is the standard approach for self-consistent calculations.
+
+* **ELE_ABUN**: Path to the elemental abundance file, relative to the root directory. This file contains the elemental budget (e.g., H, C, N, O, S abundances) used for chemical equilibrium calculations when ``IMODE = 0``. The file format should match the expected EPACRIS elemental abundance format. Example: ``"Library/elemental_abundance_files/new_x10Solar.dat"``.
+
+* **SPECIES_LIST**: Path to the molecular species list file, relative to the root directory. This file defines all molecular species, their IDs, and properties used in the chemical network. Required for chemical equilibrium and composition tracking. Example: ``"Library/SpeciesList/species_HNCSO.dat"``.
+
+* **REACTION_LIST**: Path to the chemical reaction list file, relative to the root directory. This file contains the chemical reaction network (kinetic, photochemical, thermal dissociation reactions) used for chemistry calculations. Required for chemical equilibrium when ``IMODE = 0``. Example: ``"Library/ReactionList/zone_general_CHO.dat"``.
+
+Radiative-convective solver settings
+-------------------------------------
+
+* **RadConv_Solver**: Choose the radiative-convective solver type. Set to ``0`` for Guillot TP profile (parameterized) or ``1`` for full radiative-convective climate solver (recommended). Mode ``1`` solves the full radiative transfer equations with convective adjustment.
+
+* **TIME_STEPPING**: Choose the method for solving radiative transfer flux equations. Set to ``0`` for matrix solver (faster but less stable) or ``1`` for time stepping (more stable, recommended). Time stepping iteratively approaches equilibrium and is more robust for difficult cases.
+
+* **TS_SCHEME**: Time stepping scheme for radiative transfer. Set to ``0`` for testing or ``1`` for HELIOS scheme (recommended). The HELIOS scheme uses a specific time-stepping approach optimized for atmospheric radiative transfer.
+
+* **TWO_STR_SOLVER**: Choose the two-stream radiative transfer solver. Set to ``0`` for Toon et al. (1989) delta-two-stream solver (by Renyu Hu) or ``1`` for Heng et al. (2018) two-stream solver with anisotropic scattering and non-isothermal layers (by Markus Scheucher, recommended). Mode ``1`` handles anisotropic scattering and temperature variations more accurately.
+
+* **RT_FLUX_SOLVER**: Numerical method for solving the radiative transfer flux equations. Options: ``0`` = Thomas algorithm bottom-up, ``1`` = Thomas algorithm top-down, ``2`` = LU decomposition, ``3`` = Block-tridiagonal solver, ``4`` = PTRANS-I pentadiagonal solver (recommended), ``5`` = Sogabe 2008 pentadiagonal solver. Mode ``4`` is recommended for stability and efficiency with the pentadiagonal system from Heng+2018 solver.
+
+Iteration conditions
+--------------------
+
+* **NMAX**: Maximum number of climate-chemistry coupling iterations. Typically set to ``1`` since only one iteration is needed when opacity is updated during the radiative-convective loop. Higher values allow for chemistry-climate feedback, but this is rarely necessary.
+
+* **NMAX_RC**: Maximum number of radiative-convective iterations. Each iteration performs radiative transfer calculations and convective adjustments until convergence. Increase this value if convergence is slow or if the model stops before reaching equilibrium. Typical values range from ``10`` to ``50``, with higher values for difficult cases.
+
+* **NMAX_RT**: Maximum number of radiative transfer iterations per radiative-convective step. This controls how many RT steps are taken before checking for convective adjustment. Increase if RT convergence is slow. Typical values range from ``100`` to ``500``.
+
+* **NRT_RC**: Number of radiative transfer steps between convective adjustments after initial RT equilibrium is reached. Lower values provide more frequent convective updates but slower execution. HELIOS typically uses ``1`` step, while EPACRIS default is ``50`` for efficiency. Typical values range from ``1`` to ``50``.
+
+Atmospheric properties
+----------------------
+
+* **RefIdxType**: Refractive index type for Rayleigh scattering calculations. Choose based on the dominant atmospheric gas: ``0`` = Air, ``1`` = CO2, ``2`` = He, ``3`` = N2, ``4`` = NH3, ``5`` = CH4, ``6`` = H2 (common for gas giants), ``7`` = O2, ``8`` = CO, ``9`` = H2O. The refractive index affects Rayleigh scattering cross-sections and should match the bulk atmospheric composition.
+
+* **AIRM**: Initial mean molecular mass of the atmosphere in atomic mass units. Used as a starting guess for the atmospheric composition calculation. The actual mean molecular mass is calculated during the run based on the composition. Typical values: ``2.3`` for H2-dominated, ``28`` for N2-dominated, ``44`` for CO2-dominated atmospheres.
+
+* **FADV**: Advection factor controlling heat redistribution in the atmosphere. Value of ``0.25`` means uniformly distributed flux (full redistribution), ``0.6667`` means no advection (local heating only). Intermediate values provide partial redistribution. This parameter affects the day-night heat transport and global energy balance.
+
+* **THETAANGLE**: Slant path angle for incoming stellar radiation in degrees. This accounts for the geometry of stellar illumination. Set to ``60`` for global average (recommended for 1D models), ``30`` for hemispheric average, or ``0`` for vertical incidence. The angle is converted to radians internally as ``THETAREF = π/180 × THETAANGLE``.
+
+* **PSURFAB**: Planet surface reflectivity (albedo) for shortwave radiation. Value ranges from ``0.0`` (perfect absorber) to ``1.0`` (perfect reflector). This affects the amount of stellar flux absorbed at the surface. Typical values range from ``0.0`` to ``0.3`` depending on surface composition.
+
+* **PSURFEM**: Planet surface emissivity for longwave radiation. Value ranges from ``0.0`` to ``1.0``, where ``1.0`` is a perfect blackbody emitter. This affects the thermal emission from the surface. Most surfaces have emissivity near ``1.0``.
+
+* **TINTSET**: Internal heat flux temperature in Kelvin, representing heat flux from the planet's interior. This adds a constant upward heat flux at the bottom boundary, simulating geothermal or tidal heating. Typical values range from ``0`` (no internal heat) to ``100`` K for active planets. Higher values increase the deep atmospheric temperature.
+
+* **TVARTOTAL_TOL**: Temperature variation tolerance (in Kelvin) used for climate-chemistry iteration convergence checks. This parameter is rarely triggered since only one climate-chemistry iteration is typically needed with opacity updating. Default value is ``1.0`` K.

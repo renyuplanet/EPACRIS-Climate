@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'EPACRIS-cloud'
+project = 'EPACRIS-Climate Cloud'
 copyright = '2025, Renyu Hu, Markus Scheucher, Mantas Zilinskas'
 author = 'Renyu Hu, Markus Scheucher, Mantas Zilinskas'
 release = '0.1'
@@ -16,6 +16,7 @@ release = '0.1'
 
 extensions = []
 
+root_doc = "About"
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
