@@ -1,4 +1,1 @@
-.. toctree::
-   :maxdepth: 1
-
-   About
+.. include:: About.rst
