@@ -30,6 +30,10 @@ Cloud physics & condensation configuration
 
 * **ENABLE_COLD_TRAP**: Enable cold trap mechanism that limits vapor abundance above condensation regions. Set to ``0`` to disable or ``1`` to enable. When enabled, condensible species are depleted above their condensation level, simulating efficient removal by settling or rainout. Only affects condensible species.
 
+* **FREEZE_CLOUD**: Enable to freeze the state of condensed material prohibiting the cloud from evolving during the iteration. Set to ``0`` to disable or ``1`` to enable. When enabled, ``FREEZE_CLOUD_AFTER_NMAX_RC`` value needs to be chosen.
+
+* **FREEZE_CLOUD_AFTER_NMAX_RC**: Determines when the condensed material is frozen. ``0`` freezes the state after the initial condensation calculation. ``n > 0`` freezes after the ``n`` radiative-convective iterations ``NMAX_RC``.
+
 * **USE_EPACRIS_FORMAT**: Choose the format for cloud Mie scattering lookup tables. Set to ``0`` for LX-Mie format (as used in HELIOS) or ``1`` for EPACRIS format. EPACRIS format uses separate files (``Albedo.dat``, ``Cross.dat``, ``Geo.dat``) while LX-Mie uses radius-named files (``r0.010000.dat``, ``r0.012589.dat``, ``r0.015849.dat``, etc.).
 
 * **CLOUD_MIE_DIRECTORY_EPACRIS**: Base directory path for EPACRIS format Mie scattering tables. The directory structure should be ``<DIRECTORY>/<SPECIES_NAME>/`` (e.g., ``EPACRIS_MIE/H2O/``) containing ``Albedo.dat``, ``Cross.dat``, and ``Geo.dat`` files. See the :doc:`Code_structure` section for more details about the Mie table formatting.
@@ -75,32 +79,32 @@ Live plotting and debugging
 Planet and stellar properties
 -----------------------------
 
-* **MASS_PLANET**: Planet mass in kilograms. Used to calculate surface gravity, which affects atmospheric structure, scale height, and cloud particle settling velocities. Typical values range from ``1e24`` kg (Earth-like) to ``1e27`` kg (Jupiter-like).
+* **MASS_PLANET**: Planet mass in kilograms. Used to calculate surface gravity, which affects atmospheric structure, scale height, and cloud particle settling velocities.
 
-* **RADIUS_PLANET**: Planet radius in meters. Combined with ``MASS_PLANET``, this determines surface gravity (g = GM/R²). Also affects the geometric factor for stellar flux absorption. Typical values range from ``6e6`` m (Earth-like) to ``7e7`` m (Jupiter-like).
+* **RADIUS_PLANET**: Planet radius in meters. Combined with ``MASS_PLANET``, this determines surface gravity (g = GM/R²).
 
-* **ORBIT**: Planet's semi-major axis in astronomical units (AU). Used to scale the stellar flux by ``1/ORBIT²``, accounting for the inverse-square law of radiation. Closer planets receive more stellar flux. Typical exoplanet values range from ``0.01`` AU (hot Jupiters) to ``10`` AU (cold planets).
+* **ORBIT**: Planet's semi-major axis in astronomical units (AU). Used to scale the stellar flux by ``1/ORBIT²``.
 
-* **KZZ**: Eddy diffusion coefficient in cm²/s. Controls vertical mixing and turbulent transport in the atmosphere. Higher values lead to more mixing, smaller cloud particles (due to increased updraft), and broader vertical distributions. Typical values range from ``1e6`` to ``1e9`` cm²/s. This parameter significantly affects cloud microphysics and particle sizes.
+* **KZZ**: Eddy diffusion coefficient in cm²/s. Higher values lead to smaller cloud particles (due to increased updraft). Typical values range from ``1e6`` to ``1e9`` cm²/s.
 
-* **STAR_SPEC**: Path to the stellar spectrum file, relative to the root directory. The file should contain two columns: wavelength (nm) and flux (W/m²/nm at 1 AU). The flux is automatically scaled by ``1/ORBIT²`` and ``FaintSun``. Example: ``"Library/Star/gj876.txt"``.
+* **STAR_SPEC**: Path to the stellar spectrum file, relative to the root directory. The file should contain two columns: wavelength (nm) and flux (W/m²/nm at 1 AU). The flux is automatically scaled by ``1/ORBIT²`` and ``FaintSun``.
 
-* **STAR_RADIUS**: Stellar radius in units of solar radius. Used for geometric calculations if needed. Typical values range from ``0.1`` (M-dwarfs) to ``10`` (giant stars). Default solar radius is ``6.96e8`` m.
+* **STAR_RADIUS**: Stellar radius in units of solar radius.
 
-* **STAR_TEMP**: Stellar effective temperature in Kelvin. Used for blackbody calculations and flux scaling if needed. Typical values range from ``2500`` K (M-dwarfs) to ``10000`` K (A-stars). The actual spectrum should be provided in ``STAR_SPEC`` file.
+* **STAR_TEMP**: Stellar effective temperature in Kelvin.
 
-* **FaintSun**: Factor to reduce incoming stellar flux, mimicking planetary albedo or stellar evolution effects. Value of ``1.0`` means full flux absorption, ``0.3`` means only 30% of flux is absorbed (equivalent to 70% albedo). The flux is multiplied by this factor after orbital distance scaling. Typical values range from ``0.1`` to ``1.0``.
+* **FaintSun**: Factor to reduce incoming stellar flux, mimicking planetary albedo or stellar evolution effects. Value of ``1.0`` means full flux absorption, ``0.3`` means only 30% of flux is absorbed (equivalent to 70% albedo). The flux is multiplied by this factor after orbital distance scaling.
 
 Initial concentration setting
 ------------------------------
 
 * **IMODE**: Method for setting initial atmospheric composition. Set to ``0`` for chemical equilibrium calculation (recommended), ``1`` to import from ``SPECIES_LIST`` file, ``2`` to import from previous calculation results, ``3`` for simplified chemical equilibrium formula, or ``4`` to import TP profile only for radiative calculations. Mode ``0`` is the standard approach for self-consistent calculations.
 
-* **ELE_ABUN**: Path to the elemental abundance file, relative to the root directory. This file contains the elemental budget (e.g., H, C, N, O, S abundances) used for chemical equilibrium calculations when ``IMODE = 0``. The file format should match the expected EPACRIS elemental abundance format. Example: ``"Library/elemental_abundance_files/new_x10Solar.dat"``.
+* **ELE_ABUN**: Path to the elemental abundance file, relative to the root directory. This file contains the elemental budget (e.g., H, C, N, O, S abundances) used for chemical equilibrium calculations when ``IMODE = 0``. The file format should match the expected EPACRIS elemental abundance format.
 
-* **SPECIES_LIST**: Path to the molecular species list file, relative to the root directory. This file defines all molecular species, their IDs, and properties used in the chemical network. Required for chemical equilibrium and composition tracking. Example: ``"Library/SpeciesList/species_HNCSO.dat"``.
+* **SPECIES_LIST**: Path to the molecular species list file, relative to the root directory. This file defines all molecular species, their IDs, and their custom abundances. This file needs to be adjusted if adding/removing new species or using ``IMODE 1``.
 
-* **REACTION_LIST**: Path to the chemical reaction list file, relative to the root directory. This file contains the chemical reaction network (kinetic, photochemical, thermal dissociation reactions) used for chemistry calculations. Required for chemical equilibrium when ``IMODE = 0``. Example: ``"Library/ReactionList/zone_general_CHO.dat"``.
+* **REACTION_LIST**: Path to the chemical reaction list file, relative to the root directory. This file contains the chemical reaction network (kinetic, photochemical, thermal dissociation reactions) used only for chemical kinetics (kinetics module is not connected).
 
 Radiative-convective solver settings
 -------------------------------------

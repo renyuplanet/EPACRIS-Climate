@@ -26,8 +26,8 @@ Authors
 Quick user guide
 ----------------
 
-* To compile: ``gcc epacris_main.c -lm``
-* To run: ``./a.out``
+* To compile: ``gcc epacris_main.c -lm -o epacris``
+* To run: ``./epacris``
 * Config file is ``config.h`` in the root folder.
 
 Acknowledgement
