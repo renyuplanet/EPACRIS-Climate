@@ -98,7 +98,9 @@ Planet and stellar properties
 Initial concentration setting
 ------------------------------
 
-* **IMODE**: Method for setting initial atmospheric composition. Set to ``0`` for chemical equilibrium calculation (recommended), ``1`` to import from ``SPECIES_LIST`` file, ``2`` to import from previous calculation results, ``3`` for simplified chemical equilibrium formula, or ``4`` to import TP profile only for radiative calculations. Mode ``0`` is the standard approach for self-consistent calculations.
+* **IMODE**: Method for setting initial atmospheric composition. Set to ``0`` for chemical equilibrium calculation (recommended), ``1`` to import from ``SPECIES_LIST`` file, ``2`` to import from previous calculation results, ``3`` for simplified chemical equilibrium formula. Mode ``0`` is the standard approach for self-consistent calculations.
+
+* **IMODE_CHEM_FILE**: File containing concentrations of species, which is saved from a previous EPACRIS run (e.g., "Results/K2-18b/ConcentrationSTD_T.dat")
 
 * **ELE_ABUN**: Path to the elemental abundance file, relative to the root directory. This file contains the elemental budget (e.g., H, C, N, O, S abundances) used for chemical equilibrium calculations when ``IMODE = 0``. The file format should match the expected EPACRIS elemental abundance format.
 

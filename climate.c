@@ -424,9 +424,9 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
 
 
 
-        //============================================================
+        //--------------------------------------------------------------------- 
         // CONVECTION and CONDENSATION BEGINS HERE
-        //============================================================
+        //--------------------------------------------------------------------- 
 
         deltaconv = zbin; // Start with all layers convective
         while (deltaconv > 0) // Continue until no convective layers are found
@@ -451,6 +451,25 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
                     if(clouds[j][k] > 0.0) nclouds[j] += 1;
                 }
             }
+            
+            // Freeze clouds if enabled and we've reached the freeze point (after condensation calculation)
+            // FREEZE_CLOUD_AFTER_NMAX_RC == 0 means freeze initial state (after first iteration)
+            // FREEZE_CLOUD_AFTER_NMAX_RC > 0 means freeze after that many iterations
+            if (FREEZE_CLOUD && !are_clouds_frozen()) {
+                if (FREEZE_CLOUD_AFTER_NMAX_RC == 0 && i == 1) {
+                    // Freeze after first RC iteration (initial condensation state)
+                    freeze_cloud_state();
+                } else if (FREEZE_CLOUD_AFTER_NMAX_RC > 0 && i == FREEZE_CLOUD_AFTER_NMAX_RC) {
+                    // Freeze after specified number of RC iterations
+                    freeze_cloud_state();
+                }
+            }
+            
+            // Restore frozen state after condensation loop if frozen
+            // // This ensures arrays stay consistent with frozen state (in case of any modifications)
+            // if (FREEZE_CLOUD && are_clouds_frozen()) {
+            //     restore_frozen_clouds();
+            // }
             
             // Recalculate heliumnumber after condensation (xx changes when gas condenses)
             // This ensures heliumnumber accounts for material moved from gas (xx) to clouds

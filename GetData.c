@@ -33,8 +33,16 @@ void GetData3(FILE *iop, int n, int size, double *var1, double *var2, double *va
       int i=0;
       while (fgets(dataline, n, iop) != NULL )
       {
-            sscanf(dataline, "%lf %lf %lf", var1+i, var2+i, var3+i);
-            i=i+1;
+            // Skip lines that start with # (header lines) or are empty/whitespace
+            if (dataline[0] == '#' || dataline[0] == '\n' || dataline[0] == '\r') {
+                  continue;
+            }
+            // Try to read three values, skip if parsing fails
+            if (sscanf(dataline, "%lf %lf %lf", var1+i, var2+i, var3+i) == 3) {
+                  i=i+1;
+            }
+            // Stop if we've read enough data
+            if (i >= size) break;
       }
 }
 

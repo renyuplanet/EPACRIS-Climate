@@ -43,6 +43,11 @@ static int global_alpha_initialized = 0; // Initialized flag
 static double original_xtotal_values[zbin+1][MAX_CONDENSIBLES]; // Original abundance before cold trapping
 static int original_xtotal_initialized = 0; // Initialized flag
 
+// Cloud freezing: store frozen cloud state AND gas phase for condensible species
+static double frozen_clouds[zbin+1][NSP+1]; // Frozen cloud abundances
+static double frozen_xx[zbin+1][NSP+1]; // Frozen gas phase abundances for condensible species
+static int clouds_frozen = 0; // Flag: 1 if clouds are frozen, 0 if not
+
 //--------------------------------------------------------------------- 
 /* Functions */
 //--------------------------------------------------------------------- 
@@ -154,7 +159,7 @@ void condensation_and_lapse_rate(int lay, double lapse[], double xxHe, double* c
     double Xc[NCONDENSIBLES],cp_c[NCONDENSIBLES]; //condensibles fractions in condensed form (Xc) and heat cap. (cp_c)
     double alpha[NCONDENSIBLES], beta[NCONDENSIBLES], latent[NCONDENSIBLES]; // Latent heat and B=L/RT for each condensible
     
-    // MINIMAL FIX: Initialize only beta array to prevent false latent heat effects
+    // Initialize only beta array to prevent false latent heat effects
     // (Other arrays will be properly set in the loop below)
     for (int init_i = 0; init_i < NCONDENSIBLES; init_i++) {
         beta[init_i] = 0.0;  // Critical: ensure no false latent heat
@@ -176,7 +181,6 @@ void condensation_and_lapse_rate(int lay, double lapse[], double xxHe, double* c
 
     Xd = 1.0; //mole fraction of non-condensible gas
     cp_d = 0.0; //heat capacity of non-condensible gas
-
 
     //Assign mol fractions:
     for (i=0; i<NCONDENSIBLES; i++)
@@ -214,124 +218,134 @@ void condensation_and_lapse_rate(int lay, double lapse[], double xxHe, double* c
 
 
         // Start condensation calculation
-        Xc[i] = clouds[lay][CONDENSIBLES[i]]/MM[lay]; //preexisting clouds taken into account. Divide by MM to get mole fraction from molecules cm^-3
-        Xv[i] = xx[lay][CONDENSIBLES[i]]/MM[lay]; //gas fraction of condensibles MM is in molec/cm^3
-
-                // Calculate total available condensible amount. Does not include the dry component
-        double Xtotal = Xv[i] + Xc[i];  // Total condensible (gas + cloud)
-        
+        // If clouds are frozen, use frozen state directly from frozen arrays
+        // Otherwise, use current state from clouds and xx arrays
+        if (clouds_frozen) {
+            // Use frozen abundances directly - don't modify actual arrays
+            // These values are used only for lapse rate and cp calculations
+            Xc[i] = frozen_clouds[lay][CONDENSIBLES[i]]/MM[lay];
+            Xv[i] = frozen_xx[lay][CONDENSIBLES[i]]/MM[lay];
+            
+            // Dry gas fraction
+            Xd -= Xv[i] + Xc[i];
+        } else {
+            // Normal mode: use current state and calculate condensation
+            Xc[i] = clouds[lay][CONDENSIBLES[i]]/MM[lay]; //preexisting clouds taken into account. Divide by MM to get mole fraction from molecules cm^-3
+            Xv[i] = xx[lay][CONDENSIBLES[i]]/MM[lay]; //gas fraction of condensibles MM is in molec/cm^3
+            // Calculate total available condensible amount. Does not include the dry component
+            double Xtotal = Xv[i] + Xc[i];  // Total condensible (gas + cloud)
+            
 #if ENABLE_COLD_TRAP_ALPHA
-        // TRACK ORIGINAL ABUNDANCE: Store the original Xtotal on first encounter
-        store_original_xtotal(lay, i, Xtotal);
+            // TRACK ORIGINAL ABUNDANCE: Store the original Xtotal on first encounter
+            store_original_xtotal(lay, i, Xtotal);
 #endif
-        
-        // +++++++++++++++++++++++++++ Cold Trapping +++++++++++++++++++++++++++
-        // COLD TRAP MECHANISM: Apply transport limitation for ALL condensible species
-        double Xtotal_before_coldtrap = Xtotal;  // Default: no cold trapping
+            
+            // +++++++++++++++++++++++++++ Cold Trapping +++++++++++++++++++++++++++
+            // COLD TRAP MECHANISM: Apply transport limitation for ALL condensible species
+            double Xtotal_before_coldtrap = Xtotal;  // Default: no cold trapping
 
-        if (ENABLE_COLD_TRAP && lay > 1) {  // All condensibles, if enabled, not bottom layer
-            // Check if any layer below has condensation of this species (indicating a cold trap)
-            double min_gas_below = 1.0e10;  // Very large initial value
-            bool found_condensation_below = false;
+            if (ENABLE_COLD_TRAP && lay > 1) {  // All condensibles, if enabled, not bottom layer
+                // Check if any layer below has condensation of this species (indicating a cold trap)
+                double min_gas_below = 1.0e10;  // Very large initial value
+                bool found_condensation_below = false;
 
-            // Check all layers below starting from lay - 1
-            for (int check_layer = lay - 1; check_layer >= 1; check_layer--) {
+                // Check all layers below starting from lay - 1
+                for (int check_layer = lay - 1; check_layer >= 1; check_layer--) {
 
-                // Check if this layer has condensation of current species
-                double gas_mf = xx[check_layer][CONDENSIBLES[i]] / MM[check_layer];  // Gas mole fraction
-                double cloud_mf = clouds[check_layer][CONDENSIBLES[i]] / MM[check_layer];  // Cloud mole fraction
+                    // Check if this layer has condensation of current species
+                    double gas_mf = xx[check_layer][CONDENSIBLES[i]] / MM[check_layer];  // Gas mole fraction
+                    double cloud_mf = clouds[check_layer][CONDENSIBLES[i]] / MM[check_layer];  // Cloud mole fraction
 
-                //Check which below condensing layer has the least amount of gas
-                if (cloud_mf > 1.0e-12) {  // Significant condensation found
-                    found_condensation_below = true;
-                    // Track minimum gas-phase abundance in condensing layers
-                    if (gas_mf < min_gas_below) {
-                        min_gas_below = gas_mf;
+                    //Check which below condensing layer has the least amount of gas
+                    if (cloud_mf > 1.0e-12) {  // Significant condensation found
+                        found_condensation_below = true;
+                        // Track minimum gas-phase abundance in condensing layers
+                        if (gas_mf < min_gas_below) {
+                            min_gas_below = gas_mf;
+                        }
+                    }
+                }
+
+                // If cold trap detected, limit total species to what can pass through condensing layers
+                if (found_condensation_below && min_gas_below < 1.0e9) {
+                    // COLD TRAP DETECTED: Limit total species to what can pass through condensing layers
+                    if (Xtotal > min_gas_below) {
+                        Xtotal = min_gas_below;  // Limit to minimum gas-phase abundance below
+
+
+                    }
+                }
+                
+                // GHOST COLD TRAP FIX: Always check if current layer should match gas VMR from layer below
+                // This fixes cases where previous iterations left artificial VMR reductions
+                if (lay > 1) {  // Not bottom layer
+                    double current_cloud = Xc[i];
+                    double gas_below = xx[lay-1][CONDENSIBLES[i]] / MM[lay-1];
+                    double cloud_below = clouds[lay-1][CONDENSIBLES[i]] / MM[lay-1];
+                    double current_gas = Xv[i];
+                    
+                    // If current layer has no significant condensation and VMR is lower than layer below, fix it
+                    if (current_cloud < 1.0e-12 && cloud_below < 1.0e-12 && current_gas < gas_below * 0.9) {
+                        Xtotal = gas_below;  // Set to same VMR as layer below
+                        
+                        // if (lay < 90) {  // Debug output
+                        //     printf("GHOST COLD TRAP FIX: Layer %d Species %d VMR %.6e → %.6e (matching layer below)\n",
+                        //            lay, CONDENSIBLES[i], current_gas, gas_below);
+                        // }
                     }
                 }
             }
+            // +++++++++++++++++++++++++++ End of cold trap +++++++++++++++++++++++++++
 
-            // If cold trap detected, limit total species to what can pass through condensing layers
-            if (found_condensation_below && min_gas_below < 1.0e9) {
-                // COLD TRAP DETECTED: Limit total species to what can pass through condensing layers
-                if (Xtotal > min_gas_below) {
-                    Xtotal = min_gas_below;  // Limit to minimum gas-phase abundance below
+            // Calculate equilibrium partitioning using (potentially reduced) Xtotal
+            double Xv_sat = psat[i] / pl[lay];  // Maximum gas phase at saturation
+            double Xc_equilibrium = fmax(0.0, Xtotal - Xv_sat);  // Equilibrium cloud amount
 
 
-                }
+
+            // Update phases while conserving total mass
+            if (Xtotal > Xv_sat) {
+                // Supersaturated: some should be cloud
+                Xv[i] = Xv_sat;
+                Xc[i] = Xc_equilibrium;
+            } else {
+                // Undersaturated: all should be gas  
+                Xv[i] = Xtotal;
+                Xc[i] = 0.0;
             }
-            
-            // GHOST COLD TRAP FIX: Always check if current layer should match gas VMR from layer below
-            // This fixes cases where previous iterations left artificial VMR reductions
-            if (lay > 1) {  // Not bottom layer
-                double current_cloud = Xc[i];
-                double gas_below = xx[lay-1][CONDENSIBLES[i]] / MM[lay-1];
-                double cloud_below = clouds[lay-1][CONDENSIBLES[i]] / MM[lay-1];
-                double current_gas = Xv[i];
-                
-                // If current layer has no significant condensation and VMR is lower than layer below, fix it
-                if (current_cloud < 1.0e-12 && cloud_below < 1.0e-12 && current_gas < gas_below * 0.9) {
-                    Xtotal = gas_below;  // Set to same VMR as layer below
-                    
-                    // if (lay < 90) {  // Debug output
-                    //     printf("GHOST COLD TRAP FIX: Layer %d Species %d VMR %.6e → %.6e (matching layer below)\n",
-                    //            lay, CONDENSIBLES[i], current_gas, gas_below);
-                    // }
-                }
-            }
-        }
-        // +++++++++++++++++++++++++++ End of cold trap +++++++++++++++++++++++++++
 
-        // Calculate equilibrium partitioning using (potentially reduced) Xtotal
-        double Xv_sat = psat[i] / pl[lay];  // Maximum gas phase at saturation
-        double Xc_equilibrium = fmax(0.0, Xtotal - Xv_sat);  // Equilibrium cloud amount
-
-
-
-        // Update phases while conserving total mass
-        if (Xtotal > Xv_sat) {
-            // Supersaturated: some should be cloud
-            Xv[i] = Xv_sat;
-            Xc[i] = Xc_equilibrium;
-        } else {
-            // Undersaturated: all should be gas  
-            Xv[i] = Xtotal;
-            Xc[i] = 0.0;
-        }
-
-
-
-        // Dry gas fraction
-        Xd -= Xv[i] + Xc[i];
+            // Dry gas fraction
+            Xd -= Xv[i] + Xc[i];
 
 
 #if ENABLE_COLD_TRAP_ALPHA
-        // CALCULATE ALPHA RELATIVE TO ORIGINAL ABUNDANCE
-        // Alpha represents the fraction of ORIGINAL material remaining in the atmosphere
-        double original_xtotal = get_original_xtotal(lay, i);
-        double alpha_value;
-        
-        if (original_xtotal > 0.0) {
-            // Calculate alpha as fraction of original abundance
-            alpha_value = Xtotal / original_xtotal;
+            // CALCULATE ALPHA RELATIVE TO ORIGINAL ABUNDANCE
+            // Alpha represents the fraction of ORIGINAL material remaining in the atmosphere
+            double original_xtotal = get_original_xtotal(lay, i);
+            double alpha_value;
             
-            // Ensure alpha stays within physical bounds [0, 1]
-            if (alpha_value > 1.0) alpha_value = 1.0;  // Can't have more than original
-            if (alpha_value < 0.0) alpha_value = 0.0;  // Can't have negative
-            
-            if (lay > 30 && CONDENSIBLES[i] == 7) {
-                printf("Layer %d, Species %d: Original=%.6e, Current=%.6e, Alpha=%.6e\n", 
-                       lay, CONDENSIBLES[i], original_xtotal, Xtotal, alpha_value);
+            if (original_xtotal > 0.0) {
+                // Calculate alpha as fraction of original abundance
+                alpha_value = Xtotal / original_xtotal;
+                
+                // Ensure alpha stays within physical bounds [0, 1]
+                if (alpha_value > 1.0) alpha_value = 1.0;  // Can't have more than original
+                if (alpha_value < 0.0) alpha_value = 0.0;  // Can't have negative
+                
+                if (lay > 30 && CONDENSIBLES[i] == 7) {
+                    printf("Layer %d, Species %d: Original=%.6e, Current=%.6e, Alpha=%.6e\n", 
+                           lay, CONDENSIBLES[i], original_xtotal, Xtotal, alpha_value);
+                }
+            } else {
+                // Fallback if original not stored (shouldn't happen)
+                alpha_value = ALPHA_RAINOUT;
+                printf("WARNING: No original Xtotal for Layer %d, Species index %d\n", lay, i);
             }
-        } else {
-            // Fallback if original not stored (shouldn't happen)
-            alpha_value = ALPHA_RAINOUT;
-            printf("WARNING: No original Xtotal for Layer %d, Species index %d\n", lay, i);
-        }
-        
-        //Store this alpha for layer for species
-        update_alpha_from_cold_trapping(lay, i, alpha_value);
+            
+            //Store this alpha for layer for species
+            update_alpha_from_cold_trapping(lay, i, alpha_value);
 #endif
+        }
 
 
 
@@ -538,8 +552,10 @@ void condensation_and_lapse_rate(int lay, double lapse[], double xxHe, double* c
     *cp = cp_num / cp_denom; // Return heat capacity to climate module
 
     
-    // Setthe gas and cloud abundances based on current equilibrium
+    // Set the gas and cloud abundances based on current equilibrium
+    // If frozen, don't modify arrays - only update for non-frozen case
     for (i=0; i<NCONDENSIBLES; i++) {
+
         xx[lay][CONDENSIBLES[i]] = Xv[i] * MM[lay];
         clouds[lay][CONDENSIBLES[i]] = Xc[i] * MM[lay];
    
@@ -2145,6 +2161,79 @@ void exponential_cloud(double gravity, double P[], double **particle_number_dens
     }
     
     printf("--- HYBRID A&M + HU+2019 + MS_ADIABAT CLOUD DISTRIBUTION COMPLETE ---\n");
+}
+
+//--------------------------------------------------------------------- 
+// Cloud freezing functions
+//--------------------------------------------------------------------- 
+
+/**
+ * Freeze the current cloud state - store clouds array to frozen_clouds
+ * This prevents clouds from evolving during subsequent iterations
+ */
+void freeze_cloud_state() {
+    if (!FREEZE_CLOUD) {
+        return; // Freezing disabled
+    }
+    
+    // Copy current cloud state AND gas phase to frozen storage
+    // We need to freeze both to maintain consistency
+    for (int j = 1; j <= zbin; j++) {
+        for (int i = 1; i <= NSP; i++) {
+            frozen_clouds[j][i] = clouds[j][i];
+            frozen_xx[j][i] = xx[j][i];  // Also freeze gas phase for condensible species
+        }
+    }
+    
+    clouds_frozen = 1;
+    printf("CLOUD STATE FROZEN: Condensation will not recalculate after this point\n");
+}
+
+/**
+ * Restore frozen cloud state AND gas phase to clouds and xx arrays
+ * Called at the start of condensation calculation when clouds are frozen
+ * This ensures both condensed and gas phases remain consistent
+ * Only restores condensible species to avoid overwriting non-condensible species
+ */
+void restore_frozen_clouds() {
+    if (!clouds_frozen) {
+        return; // Nothing to restore
+    }
+    
+    // Restore frozen cloud state AND gas phase ONLY for condensible species
+    // This prevents gas phase from changing when clouds are frozen
+    // Non-condensible species are NOT restored, allowing them to evolve normally
+    for (int j = 1; j <= zbin; j++) {
+        for (int i = 0; i < NCONDENSIBLES; i++) {
+            int species_id = CONDENSIBLES[i];
+            clouds[j][species_id] = frozen_clouds[j][species_id];
+            xx[j][species_id] = frozen_xx[j][species_id];  // Restore gas phase for condensibles only
+        }
+    }
+}
+
+/**
+ * Check if clouds are currently frozen
+ * Returns 1 if frozen, 0 if not
+ */
+int are_clouds_frozen() {
+    return clouds_frozen;
+}
+
+/**
+ * Reset frozen cloud state - clears frozen flag and frozen storage
+ * Should be called at the start of each NMAX iteration to reset state
+ */
+void reset_frozen_cloud_state() {
+    clouds_frozen = 0;
+    
+    // Clear frozen cloud and gas phase storage
+    for (int j = 1; j <= zbin; j++) {
+        for (int i = 1; i <= NSP; i++) {
+            frozen_clouds[j][i] = 0.0;
+            frozen_xx[j][i] = 0.0;
+        }
+    }
 }
 
 

@@ -361,20 +361,20 @@ void ms_RadTrans(double Rflux[], double tempbnew[], double P[], int ncl, int isc
         }
 		
         // Old Marcus Debugging:
-        /*printf("%s\n","\n==== w_0 ===="); //template
-        for (i=0;i<=zbin;i++)
-        {
-            printf("%s %d\t%.3e\n","w_0 ",i,w[i]);
-        }*/
+/*printf("%s\n","\n==== w_0 ===="); //template
+for (i=0;i<=zbin;i++)
+{
+    printf("%s %d\t%.3e\n","w_0 ",i,w[i]);
+}*/
 
 
         // Asymmetry Factor
-        /* +++ OJO +++++++++++++++++++++++++++++++++++++++++++++++
-        * ms_two_str can deal with scattering of larger molecules. 
-        *+++ To be addressed ++++++++++++++++++++++++++++++++++++*/
+/* +++ OJO +++++++++++++++++++++++++++++++++++++++++++++++
+ * ms_two_str can deal with scattering of larger molecules. 
+ *+++ To be addressed ++++++++++++++++++++++++++++++++++++*/
 
-        tau[0] = 0.0;    //ms2022: just to make sure
-        TAUdoub[0] = 0.0; //ms2023: double grid
+                tau[0] = 0.0;    //ms2022: just to make sure
+                TAUdoub[0] = 0.0; //ms2023: double grid
 		for (j=1; j <= zbin; j++) {
 			g[j] = 0.0; 
 			j1   = zbin+1-j;
@@ -410,7 +410,7 @@ void ms_RadTrans(double Rflux[], double tempbnew[], double P[], int ncl, int isc
 
                         //g[j] = 1.0; //testing pure absorption
 		}
-
+		
         //Print max and minimum values of g
         //printf("Max value of g: %f, Min value of g: %f\n", fmax(g[1], g[zbin]), fmin(g[1], g[zbin]));
 		/* Optical Depth of Each Layer */

@@ -87,71 +87,71 @@ void readcia(void) {
 			}
 		}
 	} else {
-		if (!h2h2_file->loaded) {
-			strcpy(crossfile, CROSSHEADING);
-			strcat(crossfile, "H2-H2_CIA.dat");
-			strcpy(h2h2_file->filename, crossfile);
-			printf("Reading CIA file: %s\n", crossfile);
-			
-			fim = fopen(crossfile, "r");
-			if (fim == NULL) {
-				printf("Warning: Could not open CIA file: %s\n", crossfile);
-				// Initialize with zeros if file not found
-				for (i=1; i<=zbin; i++) {
-					for (j=0; j<NLAMBDA; j++) {
-						H2H2CIA[i][j] = 0.0;
-					}
-				}
-			} else {
-				s = LineNumber(fim, 20000);  // Increased buffer for larger files
-				fclose(fim);
-				nl = s-1;
-				h2h2_file->num_lines = nl;
-				
-				// Allocate matrix and read data
-				cia = dmatrix(0, nl-1, 0, 19);
-				fim = fopen(crossfile, "r");
-				temp1 = fgets(dataline, 10000, fim); /* Read in the header line */
-				
-				for (i=0; i<nl; i++) {
-					fscanf(fim, "%lf", &h2h2_file->wavelength[i]);
-					for (j=0; j<19; j++) {
-						fscanf(fim, "%le", &cia[i][j]);
-					}
-					fscanf(fim, "%le\n", &cia[i][19]);
-				}
-				fclose(fim);
-				
-				// Save to cache and calculate cross sections
-				h2h2_file->data = cia;
-				h2h2_file->loaded = 1;
-				
-				for (i=1; i<=zbin; i++) {
-					for (j=0; j<NLAMBDA; j++) {
-						H2H2CIA[i][j] = Interpolation2D(wavelength[j], tfitting[i], 
-										 h2h2_file->wavelength, nl, temp, 20, cia);
-					}
-				}
-				
-				// Write debug output
-				fout = fopen("AuxillaryOut/CheckCIA_H2H2.dat", "w");
+	if (!h2h2_file->loaded) {
+		strcpy(crossfile, CROSSHEADING);
+		strcat(crossfile, "H2-H2_CIA.dat");
+		strcpy(h2h2_file->filename, crossfile);
+		printf("Reading CIA file: %s\n", crossfile);
+		
+		fim = fopen(crossfile, "r");
+		if (fim == NULL) {
+			printf("Warning: Could not open CIA file: %s\n", crossfile);
+			// Initialize with zeros if file not found
+			for (i=1; i<=zbin; i++) {
 				for (j=0; j<NLAMBDA; j++) {
-					fprintf(fout, "%2.6f\t", wavelength[j]);
-					for (i=1; i<=zbin; i++) {
-						fprintf(fout, "%2.6e\t", H2H2CIA[i][j]);
-					}
-					fprintf(fout, "\n");
+					H2H2CIA[i][j] = 0.0;
 				}
-				fclose(fout);
 			}
 		} else {
-			printf("Using cached data for H2-H2 CIA\n");
-			// Recalculate using cached data
+			s = LineNumber(fim, 20000);  // Increased buffer for larger files
+			fclose(fim);
+			nl = s-1;
+			h2h2_file->num_lines = nl;
+			
+			// Allocate matrix and read data
+			cia = dmatrix(0, nl-1, 0, 19);
+			fim = fopen(crossfile, "r");
+			temp1 = fgets(dataline, 10000, fim); /* Read in the header line */
+			
+			for (i=0; i<nl; i++) {
+				fscanf(fim, "%lf", &h2h2_file->wavelength[i]);
+				for (j=0; j<19; j++) {
+					fscanf(fim, "%le", &cia[i][j]);
+				}
+				fscanf(fim, "%le\n", &cia[i][19]);
+			}
+			fclose(fim);
+			
+			// Save to cache and calculate cross sections
+			h2h2_file->data = cia;
+			h2h2_file->loaded = 1;
+			
 			for (i=1; i<=zbin; i++) {
 				for (j=0; j<NLAMBDA; j++) {
 					H2H2CIA[i][j] = Interpolation2D(wavelength[j], tfitting[i], 
-									h2h2_file->wavelength, h2h2_file->num_lines, 
-									temp, 20, h2h2_file->data);
+									 h2h2_file->wavelength, nl, temp, 20, cia);
+				}
+			}
+			
+			// Write debug output
+			fout = fopen("AuxillaryOut/CheckCIA_H2H2.dat", "w");
+			for (j=0; j<NLAMBDA; j++) {
+				fprintf(fout, "%2.6f\t", wavelength[j]);
+				for (i=1; i<=zbin; i++) {
+					fprintf(fout, "%2.6e\t", H2H2CIA[i][j]);
+				}
+				fprintf(fout, "\n");
+			}
+			fclose(fout);
+		}
+	} else {
+		printf("Using cached data for H2-H2 CIA\n");
+		// Recalculate using cached data
+		for (i=1; i<=zbin; i++) {
+			for (j=0; j<NLAMBDA; j++) {
+				H2H2CIA[i][j] = Interpolation2D(wavelength[j], tfitting[i], 
+								h2h2_file->wavelength, h2h2_file->num_lines, 
+								temp, 20, h2h2_file->data);
 				}
 			}
 		}

@@ -130,7 +130,7 @@ int CONDENSIBLES[MAX_CONDENSIBLES]; // Array of condensible species IDs
 #include "printout_std_t_exp.c"
 
 
-//=== START MAIN PROGRAM =================================
+//--- START MAIN PROGRAM ----------------------------------------->
 int main(int argc, char *argv[]) //ms2022: getting rid of warnings
 {
 
@@ -190,7 +190,7 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
 
     GA=GRAVITY*MASS_PLANET/RADIUS_PLANET/RADIUS_PLANET; /* Planet Surface Gravity Acceleration, in SI */	
 
-	//Set the wavelength grid for calculation
+	// Set the wavelength grid for calculation
     // Potential for optimization, to make the wl grid more efficient without loosing accuracy (old comment)
 	double dlambda, start, interval, lam[NLAMBDA];
 	start = log10(LAMBDALOW);
@@ -234,6 +234,7 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
 	for (i=0; i<NLAMBDA; i++) {
 		solar[i] = solar[i]/ORBIT/ORBIT*FaintSun;  /* convert from flux at 1 AU */
 	}
+
     // Extrapolate solar spectrum to longer wavelengths
 	i=0;
 	while (solar[i]>0 || wavelength[i]<9990 ) { i++;}
@@ -241,40 +242,71 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
 		solar[j] = solar[i-1]*pow(wavelength[i-1],4)/pow(wavelength[j],4); //ms2021: what?
 	}
 	
-	/* Initial Mean Molecular Mass */
+	// Initial Mean Molecular Mass
 	for (j=1; j<=zbin; j++) {
 		meanmolecular[j] = AIRM;
 	}
-	
-    /* Set up the P-T-z for calculation */
+
+	//
+    // -- Set up the P-T-z for calculation ------------------------------------>
+    //
+
 	double PMIN, PMAX, PSTEP;
 	if (TPMODE==1) {
 		fp=fopen(TPLIST,"r");
 		fp1=fopen(TPLIST,"r");
+		if (fp == NULL || fp1 == NULL) {
+			printf("ERROR: Cannot open TP profile file: %s\n", TPLIST);
+			exit(1);
+		}
 		s=LineNumber(fp, 1000);
+		// Allocate arrays (s includes header, but GetData3 will skip it)
 		double Height[s];
 		double Temp[s];
 		double Pre[s], lPre[s];
+		// GetData3 will skip header lines starting with # and return actual count
+		// We need to count how many lines were actually read
+		int lines_read = 0;
+		char testline[1000];
+		rewind(fp1); // Reset to beginning
+		while (fgets(testline, 1000, fp1) != NULL) {
+			if (testline[0] != '#' && testline[0] != '\n' && testline[0] != '\r') {
+				double h, p, t;
+				if (sscanf(testline, "%lf %lf %lf", &h, &p, &t) == 3) {
+					lines_read++;
+				}
+			}
+		}
+		if (lines_read == 0) {
+			printf("ERROR: No valid data found in TP profile file: %s\n", TPLIST);
+			exit(1);
+		}
+		rewind(fp1); // Reset again for GetData3
 		GetData3(fp1, 1000, s, Height, Pre, Temp);
+		s = lines_read; // Use actual data size (GetData3 will skip header)
 		fclose(fp);
 		fclose(fp1);
 		Reverse(Pre,s);
 		Reverse(Temp,s);
-		PMIN = Pre[0]; //input as P = pow(10,Pre)
-		PMAX = Pre[s-1]; //input as P = pow(10,Pre)
+		PMIN = Pre[0]; //input as P = pow(10,Pre) - Pre is log10(P)
+		PMAX = Pre[s-1]; //input as P = pow(10,Pre) - Pre is log10(P)
 //ms2023		PSTEP = (PMAX - PMIN)/zbin;
-        for (j=0;j<s;j++) lPre[j] = log(pow(10,Pre[j]));
-                PSTEP = log( pow(10,PMAX) / pow(10,PMIN) ) / zbin; //convert to natural log for obvious reasons
+        // Convert log10(P) to natural log(P): ln(P) = log10(P) * ln(10)
+        for (j=0;j<s;j++) lPre[j] = Pre[j] * log(10.0);
+        PSTEP = log( pow(10.0,PMAX) / pow(10.0,PMIN) ) / zbin; //convert to natural log for obvious reasons
 		for (j=0; j<=zbin; j++) { 
 //ms2023			PP[j] = PMAX - j*PSTEP;
 			PP[j] = log(pow(10,PMAX)) - j*PSTEP;
 //ms2023			P[j]  = pow(10.0, PP[j]);
                         P[j] = exp(PP[j]); //natural log again
                         Pdoub[2*j] = P[j]; //ms2023: double grid
-                        Tdoub[2*j] = T[j]; //ms2023: double grid
 		}
 //ms2023		Interpolation(PP,zbin+1,T,Pre,Temp,s,0);
 		Interpolation(PP,zbin+1,T,lPre,Temp,s,2); //here interpolated linear in log(p) rather than 10^PP // rh2024: allow extrapolation to nearest
+		// Set Tdoub after interpolation (T[j] is now set)
+		for (j=0; j<=zbin; j++) {
+			Tdoub[2*j] = T[j]; //ms2023: double grid
+		}
 // rh2024        for (j=0; j<=zbin; j++) {printf("%s %f %f\n","PT",PP[j],T[j]);}
 		for (j=1; j<=zbin; j++) {
 			tl[j] = (T[j]+T[j-1])/2.0; /* Temperature at the center of layer */
@@ -300,11 +332,11 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
                 printf("%s %s\n", "Initial TP profile imported from ",TPLIST);
 	}
 	
-	/* Set up the P-T-z for calculation */
+	// Set up the P-T-z for calculation
 	if (TPMODE==0) {
-        //Compute irradiation temperature
+        // Compute irradiation temperature
         if (TTOP == 0) {  // Only calculate if TTOP not provided
-            new_ttop = STAR_TEMP * pow((STAR_RADIUS*0.00465047/ORBIT), 0.5) * pow(FADV, 0.25); //calculate equilibrium temperature at the top of atm
+            new_ttop = STAR_TEMP * pow((STAR_RADIUS*0.00465047/ORBIT), 0.5) * pow(FADV, 0.25); // Calculate equilibrium temperature at the top of atm
             TPPara(P,T,TINV,zbin+1,PTOP,new_ttop,PMIDDLE,new_ttop,PSTR,new_ttop,PTROP,new_ttop,PBOTTOM);
         } else {
             printf("Note: Using predefined temperature value from parameter file\n");
@@ -334,7 +366,7 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
 			scaleheight = KBOLTZMANN * tl[j] / AIRM / AMU / GA /1000.0 ; /* km */
 			z[j] = z[j-1] - scaleheight*log(P[j]/P[j-1]);
 			zl[j] = z[j-1] - scaleheight*log(pl[j]/P[j-1]); //ms2023
-                        zdoub[2*j] = z[j]; //ms2023: double grid
+            zdoub[2*j] = z[j]; //ms2023: double grid
             //printf("z[%d] = %f, zl[%d] = %f\n", j, z[j], j, zl[j]);//ms2023
 		}
 //ms2023		for (j=1; j<=zbin; j++) {
@@ -366,6 +398,8 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
 	fclose(TPPrint);
 //atexit(pexit);exit(0); //ms debugging mode
 	
+
+    //--- Set up the chemistry ----------------------------------------->
     printf("%s\n",fillmi);
     printf("%s\n", "Chemistry setup:");
     printf("%s\n",fillmi);
@@ -646,7 +680,9 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
 		for (j=0;j<NLAMBDA;j++) {fprintf(fcheck, "%lf %le %le %lf %lf\n", wavelength[j], cross[i][j], crosst[i][j], qy[i][j], qyt[i][j]);} 
 	}
 	
-	/* cross section of aerosols */
+    //
+	// Unused old implementation of cross sections for aerosols
+    //
 	double *crossp1, *crossp2, *crossp3;
 	double crossw1[NLAMBDA], crossw2[NLAMBDA], crossw3[NLAMBDA];
 	fp=fopen(AERRADFILE1,"r");
@@ -749,13 +785,15 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
     
         //for (j=1; j<=zbin; j++)  for (i=1; i<=NSP; i++) clouds[j][i]=0.0; //initializing for Climate
 
-        /* IMODE = 4: from existing files */
+    // Chemistry mode and get initial molecular concentration
     time_t start_time = time(NULL); //start timer for chem eq
-    if (IMODE == 4) {
-        strcpy(outstd0,dirroute);
-        strcat(outstd0,"/ConcentrationSTD_C.dat");
-        printf("%s\t%s\n","Prepare to get initial molecular concentration from", outstd0);
-        fimport=fopen(outstd0, "r");
+    if (IMODE == 2) {
+        printf("%s\t%s\n","Prepare to get initial molecular concentration from", IMODE_CHEM_FILE);
+        fimport=fopen(IMODE_CHEM_FILE, "r");
+        if (fimport == NULL) {
+            printf("ERROR: Cannot open concentration file: %s\n", IMODE_CHEM_FILE);
+            exit(1);
+        }
         fimportcheck=fopen("AuxillaryOut/Fimportcheck.dat","w");
         temp=fgets(dataline, 10000, fimport); // Read in the header line //
         temp=fgets(dataline, 10000, fimport); // Read in the header line //
@@ -787,18 +825,17 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
                 importnn_save1[zbin-j] = importnn_save[j][i];
                 importpl[zbin-j] = log(pl[j]);
             }
-            Interpolation(importpl,zbin,importnn_save2,importpres_save,importnn_save1,zbin,0);
-            if (importnn_save2[0]==0) { importnn_save2[0]=importnn_save1[0]-importpres_save[0]+importpl[0];
-            }
-            if (importnn_save2[zbin-1]==0) { importnn_save2[zbin-1]=importnn_save1[zbin-1]-importpres_save[zbin-1]+importpl[zbin-1];
-            }
+            // Interpolate from imported pressure grid to current pressure grid
+            // Use IFEX=2 (nearest value) for extrapolation to handle pressure range mismatches
+            Interpolation(importpl,zbin,importnn_save2,importpres_save,importnn_save1,zbin,2);
             if (i==43) {
                 for (j=1; j<=zbin; j++) {
                     printf("%f %f %f %f\n",importpl[j-1],importnn_save2[j-1],importpres_save[j-1],importnn_save1[j-1]);
                 }
             }
             for (j=1; j<=zbin; j++) {
-                xx[j][i]=exp(importnn_save2[zbin-j]);
+                // File contains mixing ratios (xx/MM), so convert back to number density: xx = mixing_ratio * MM
+                xx[j][i]=exp(importnn_save2[zbin-j]) * MM[j];
                 if (isnan(xx[j][i])) xx[j][i]=0.0;
             }
         }
@@ -816,11 +853,13 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
     }
 
 
+    // Initialize labels array (needed for chemquil in both initial setup and NMAX loop)
+    for (i=1; i<=numx; i++) {labels[i]=labelx[i];}
+    for (i=1; i<=numf; i++) {labels[numx+i]=labelf[i];}
+    
     if (IMODE == 0) {
     printf("%s\n", "Computing initial molecular abundances assuming chemical equilibrium:");
     /* compute the initial molecular abundances */
-    for (i=1; i<=numx; i++) {labels[i]=labelx[i];}
-    for (i=1; i<=numf; i++) {labels[numx+i]=labelf[i];}
     
     mixequil=dmatrix(1,zbin,1,numx+numf);
     for (j=1; j<=zbin; j++) {
@@ -849,7 +888,7 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
 
     }
     
-     if (IMODE < 4) {
+    if (IMODE < 4) {
     /* Generate General Variables */
     Convert1(Con, ConC, Conf, labelx, labelc, labelf); //getting XX from Con
     //printf("%s\n", "Variable initialization successful");
@@ -938,9 +977,9 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
     read_all_opacities();
     printf("Finished reading all opacity files\n");   
 
-    // Read in all cloud optical property lookup tables (LX-Mie format)
+    // Read in all cloud optical property lookup tables
     read_cloud_optical_tables_mie();
-    printf("Finished reading Mie tables (LX-Mie format)\n");   
+    printf("Finished reading Mie tables\n");
 
 
     // Initialize layer-dependent alpha values as in Graham+2021
@@ -994,8 +1033,8 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
     printf("%s\n\n",fillmi); 
     printf("******************************************\n"); 
     printf("*** Running radiative-covective solver ***\n********* Sit back and enjoy :) **********\n");
-    printf("%s\n",fillmi); 
-    printf("%s\n\n",fillmi); 
+    printf("******************************************\n\n"); 
+
     // Start timing for radiative solver
     if(RadConv_Solver == 0) GreyTemp(P,outnewtemp,TINTSET); 
     
@@ -1011,11 +1050,17 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
 //===================================================================
     for (i=0; i<NMAX; i++) { //Climate-Chemistry solver iteration
         
-        printf("%s\n",fillmi); 
-        printf("Climate-Chemistry solver iteration %d\n", i+1);
-        printf("%s\n",fillmi); 
+        // Reset frozen cloud state for each NMAX iteration
+        reset_frozen_cloud_state();
 
-        /* Determine if converged with temperature variation tolerance of 1 K */
+        printf("\n");
+        printf("******************************************\n"); 
+        printf("Climate-Chemistry solver iteration %d\n", i+1);
+        printf("******************************************\n"); 
+        printf("\n");
+        
+
+        // Determine if converged with temperature variation tolerance of 1 K
         TVARTOTAL = 0.0;
         for (j=0; j<=zbin; j++) {
             TVARTOTAL += fabs(Tnew[j] - T[j]);
@@ -1023,7 +1068,6 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
         TVARTOTAL /= zbin;
         printf("%s %f %s\n", "Temperature variation is ", TVARTOTAL, "K");
         
-        /* Check convergence */
         if (TVARTOTAL<TVARTOTAL_TOL) {
             printf("%s\n", "EPACRIS converged!");
             /* fprintf(fstat,"%s\n", "converged!");*/
@@ -1032,7 +1076,6 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
         }
         
         // If not converged, continue to next iteration
-        
         // Reset clouds array to prevent accumulation between iterations */
         for (j=1; j<=zbin; j++) {
             for (ii=1; ii<=NSP; ii++) {
@@ -1046,17 +1089,15 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
         for (j=1; j<=zbin; j++) {
             for (ii=0; ii<NLAMBDA; ii++) {
                 cH2O[j][ii] = 0.0;
-                aH2O[j][ii] = 1.0;
+                aH2O[j][ii] = 0.0;
                 gH2O[j][ii] = 0.0;
 
                 cNH3[j][ii] = 0.0;
-                aNH3[j][ii] = 1.0;
+                aNH3[j][ii] = 0.0;
                 gNH3[j][ii] = 0.0;
             }
         }
-
-
-        printf("%s\n", "Cloud and cloud opacity arrays reset for new iteration");
+        printf("%s\n", "Clouds cloud opacity arrays reset for new iteration");
         
 
         // T grids recalculated
@@ -1094,33 +1135,28 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
 
         
         // Re-calculate the initial mixing ratio from chemical equilibrium 
-        if (IMODE==0) {
-            mixequil=dmatrix(1,zbin,1,numx+numf);
-            for (j=1; j<=zbin; j++) {
-                for (ii=1; ii<=numx+numf; ii++) {
-                    mixequil[j][ii]=0.0;
-                }
+        mixequil=dmatrix(1,zbin,1,numx+numf);
+        for (j=1; j<=zbin; j++) {
+            for (ii=1; ii<=numx+numf; ii++) {
+                mixequil[j][ii]=0.0;
             }
-            chemquil(pl, tl, zbin+1, labels, numx+numf, mixequil, atomfile);
-            checkmixequil(numx+numf, mixequil);
-            for (j=1; j<=zbin; j++) {
-                totalmix = 0.0;
-                for (ii=1; ii<=numx+numf; ii++) {
-                    xx[j][labels[ii]]=MM[j]*mixequil[j][ii];
-                    totalmix += mixequil[j][ii];
-                }
-                //printf("%s %d %s %2.2f\n","Total mixing ratio at layer", j, "is", totalmix);
+        }
+        chemquil(pl, tl, zbin+1, labels, numx+numf, mixequil, atomfile);
+        checkmixequil(numx+numf, mixequil);
+        for (j=1; j<=zbin; j++) {
+            totalmix = 0.0;
+            for (ii=1; ii<=numx+numf; ii++) {
+                xx[j][labels[ii]]=MM[j]*mixequil[j][ii];
+                totalmix += mixequil[j][ii];
             }
-            free_dmatrix(mixequil,1,zbin,1,numx+numf);
+            //printf("%s %d %s %2.2f\n","Total mixing ratio at layer", j, "is", totalmix);
+        }
+        free_dmatrix(mixequil,1,zbin,1,numx+numf);
+        
         Convert2(Con, ConC, Conf, labelx, labelc, labelf);
         printf("%s\n", "The thermochem equilibrium composition is re-calculated.");
-        } // Imode==0
-        
-        if (IMODE==4) {
-        Convert2(Con, ConC, Conf, labelx, labelc, labelf);
-        printf("%s\n", "Con[i] re-calculated to incorporate any potential XX[i] changes from previous climate calculations");
-        }
-        
+
+
         /* Update Mean Molecular Mass */
         for (j=1; j<=zbin; j++) {
             totalnumber=0.0;
@@ -1137,6 +1173,16 @@ int main(int argc, char *argv[]) //ms2022: getting rid of warnings
             // printf("%s %d %s %2.2f\n","Mean Molecular Mass at layer", j, "is", meanmolecular[j]);
             // printf("%s %d %s %2.2e\n","Helium mixing ratio at layer", j, "is", heliumnumber/totalnumber);
         }
+
+        // Save concentration file at start of each NMAX iteration
+        char outstdt_iter[1024];
+        strcpy(outstdt_iter, dirroute);
+        strcat(outstdt_iter, "/ConcentrationSTD_NMAX");
+        char iter_str[20];
+        sprintf(iter_str, "_%d.dat", i+1);
+        strcat(outstdt_iter, iter_str);
+        printout_std_t(z, outstdt_iter);
+        printf("Saved concentration file: %s\n", outstdt_iter);
 
 
         // Rad-conv solver

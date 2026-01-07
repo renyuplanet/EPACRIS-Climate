@@ -38,5 +38,12 @@ void report_condensibles_changes(int iteration);
 // Helper function
 const char* get_species_name(int species_id);
 
+// Cloud freezing functions
+void freeze_cloud_state();
+void restore_frozen_clouds();
+void restore_frozen_clouds_layer(int layer);  // Restore frozen state for a single layer
+int are_clouds_frozen();
+void reset_frozen_cloud_state();
+
 #endif // CONV_COND_FUNCS_H
 

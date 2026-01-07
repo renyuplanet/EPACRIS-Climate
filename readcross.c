@@ -168,7 +168,7 @@ void cleanup_opacity_cache(void) {
 void reinterpolate_all_opacities(void) {
 	char crossfile[1024];
 	double **opac_ptr;
-
+	
 	for (int i = 0; i < NUM_SPECIES; i++) {
 		strcpy(crossfile, CROSSHEADING_STR);
 		strcat(crossfile, "opac");
@@ -179,7 +179,7 @@ void reinterpolate_all_opacities(void) {
 		opac_ptr = get_opacity_array(species[i]);
 		if (opac_ptr != NULL) {
 			reinterpolate_opacities_by_file(opac_ptr, crossfile);
-		}
+				}
 		// Silently skip if species not found (already warned in read_all_opacities)
 	}
 }
