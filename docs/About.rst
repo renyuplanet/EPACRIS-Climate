@@ -9,6 +9,8 @@ EPACRIS-Climate Cloud v0.1 Documentation
 
 EPACRIS (ExoPlanet Atmospheric Chemistry & Radiative Interaction Simulator) is a one-dimensional atmospheric structure model that solves for the temperature-pressure profile and chemical composition of planetary atmospheres in radiative-convective equilibrium. The model iteratively couples radiative transfer, convective adjustment, equilibrium chemistry, and cloud microphysics to determine the steady-state atmospheric structure and composition, based on fundamental principles and user-specified initial and boundary conditions.
 
+The code can be found at `the dev_clouds branch <https://github.com/renyuplanet/EPACRIS-Climate/tree/dev_clouds>`_.
+
 Current version overview
 ------------------------
 
