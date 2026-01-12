@@ -153,7 +153,7 @@ void condensation_and_lapse_rate(int lay, double lapse[], double xxHe, double* c
     // Local parameters
     int i,j;
 
-    //variables for adiabatic calculation
+    // Variables for adiabatic calculation
     double Xd,cp_d; // VMR of non-condensible gas, heat capacity of non-condensible gas
     double Xv[NCONDENSIBLES],Xvold,cp_v[NCONDENSIBLES]; //condensibles mol fractions in vapor form and heat cap. [Xvold is the old value of Xv]
     double Xc[NCONDENSIBLES],cp_c[NCONDENSIBLES]; //condensibles fractions in condensed form (Xc) and heat cap. (cp_c)
@@ -165,7 +165,7 @@ void condensation_and_lapse_rate(int lay, double lapse[], double xxHe, double* c
         beta[init_i] = 0.0;  // Critical: ensure no false latent heat
     }
 
-    //variables for condensation
+    // Variables for condensation
     double psat[NCONDENSIBLES]; //saturation pressures
     int saturated[NCONDENSIBLES]; //check which molecules are available for condensation
     double dp[NCONDENSIBLES]; //condensed fraction
@@ -182,7 +182,7 @@ void condensation_and_lapse_rate(int lay, double lapse[], double xxHe, double* c
     Xd = 1.0; //mole fraction of non-condensible gas
     cp_d = 0.0; //heat capacity of non-condensible gas
 
-    //Assign mol fractions:
+    // Assign mol fractions:
     for (i=0; i<NCONDENSIBLES; i++)
     {
         // Calculate saturation pressure for each condensible species

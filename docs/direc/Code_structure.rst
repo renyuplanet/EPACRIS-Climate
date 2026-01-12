@@ -14,20 +14,19 @@ EPACRIS consists of three main computational levels:
 
 3. **Supporting modules**: Provide specialized functionality including cloud physics ``conv_cond_funcs.c``, cloud optics ``cloud_optics.c``, opacity reading ``readcross.c``, ``readcia.c``, chemistry ``chemequil.c``, and utilities ``Interpolation.c``, ``Convert.c``.
 
-Main Program Flow (epacris_main.c)
------------------------------------
+Main Program Flow ``epacris_main.c``
+--------------------------------------
 
 The following sections describe each major step in the execution sequence.
 
 Initialization and Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Line 0: Parameter setup and information display**
 
-**Line ~100: Parameter setup and information display**
-
-* Initiliaze global variables and import C files
+* Initiliaze global variables and import headers/C files
 * Print run configuration information including planet properties (mass, radius, orbital distance), solver settings, and cloud physics mode.
 * Initialize loop counters and local variables.
-* Calculate global values like planet surface gravity ``GA`` and convert irradiation angle to radians.
+* Calculate global values like planet surface gravity and convert irradiation angle to radians.
 
 Wavelength Grid Setup
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -66,20 +65,17 @@ Two modes are supported based on ``TPMODE``:
 
 * **TPMODE = 0**: Generate parametric T-P profile using ``TPPara()``
   
-  * Define pressure boundaries (``PTOP``, ``PBOTTOM``, ``PMIDDLE``, etc.).
+  * Defined using pressure boundaries (``PTOP``, ``PBOTTOM``, ``PMIDDLE``, etc.).
   * Calculate equilibrium temperature at top of atmosphere from stellar irradiation.
-  * Use parametric temperature profile with specified values at key pressure levels.
   * Initializes an isothermal profile with automatic equilibrium temperature if ``TTOP = 0``
-  * Calculate atmospheric scale height and altitude grid from hydrostatic equilibrium.
+
 
 * **TPMODE = 1**: Import T-P profile from file specified by ``TPLIST``
   
   * Read altitude (km), pressure (log₁₀(Pa)), and temperature (K) data from file.
-  * Skip header lines (starting with ``#``).
-  * Convert log₁₀(P) to natural log(P) for internal use.
   * Interpolate temperature onto model pressure grid.
-  * Calculate layer-center values (``tl[]``, ``pl[]``, ``zl[]``).
 
+ 
 **Altitude Grid Calculation:**
 
 For each layer from bottom to top:
@@ -90,10 +86,10 @@ For each layer from bottom to top:
 
 **Double Grid Construction:**
 
-EPACRIS uses a double-resolution grid (``Tdoub``, ``Pdoub``, ``MMdoub``, ``zdoub``) for accurate radiative transfer in non-isothermal layers:
+EPACRIS uses a double-resolution grid ``Tdoub``, ``Pdoub``, ``MMdoub``, ``zdoub`` for accurate radiative transfer in non-isothermal layers:
 
-* Even indices (``2*j``): Layer boundaries.
-* Odd indices (``2*j-1``): Layer centers.
+* Even indices ``2*j``: Layer boundaries.
+* Odd indices ``2*j-1``: Layer centers.
 
 This allows the radiative transfer solver to account for temperature variations within layers.
 
@@ -104,7 +100,7 @@ Chemistry Setup
 
 **Species List Import:**
 
-* Read species file specified by ``SPECIES_LIST`` (e.g., ``Library/SpeciesList/species_HNCSO.dat``).
+* Read species file specified by ``SPECIES_LIST`` e.g., ``Library/SpeciesList/species_HNCSO.dat``.
 * Parse species properties: name, type (X/F/C/A), standard number, molecular mass, initial mixing ratio, boundary conditions.
 * Classify species:
   
@@ -116,12 +112,6 @@ Chemistry Setup
 **Reaction List Import (Not used in this version):**
 
 * Read reaction file specified by ``REACTION_LIST``.
-* Parse reaction types:
-  
-  * **R**: Bimolecular reactions (``numr`` reactions).
-  * **M**: Termolecular reactions (``numm`` reactions).
-  * **P**: Photolysis reactions (``nump`` reactions).
-  * **T**: Thermal dissociation reactions (``numt`` reactions).
 
 **Photolysis Cross-Sections:**
 
@@ -169,9 +159,8 @@ Opacity Loading
 
 **Memory Allocation:**
 
-* Allocate 2D arrays (``dmatrix``) for each molecular opacity: ``opacH2O[1..zbin][0..NLAMBDA-1]``.
-* Allocate cloud optical property arrays: ``cH2O``, ``aH2O``, ``gH2O`` (and NH₃).
-* Each array requires ~15 MB for typical grid sizes.
+* Allocate 2D arrays for each molecular opacity: ``opacH2O[1..zbin][0..NLAMBDA-1]``.
+* Allocate cloud optical property arrays for each defined cloud species ``CLOUD_SPECIES_LIST``: ``cH2O``, ``aH2O``, ``gH2O``... 
 
 **Opacity File Reading:**
 
@@ -187,15 +176,15 @@ Opacity Loading
 **CIA Opacity Loading:**
 
 * Call ``readcia()`` from ``readcia.c`` to load collision-induced absorption.
-* Read tables for H₂-H₂, H₂-He, N₂-N₂, N₂-H₂, CO₂-CO₂ (species currently hardcoded).
+* Read tables for H₂-H₂, H₂-He, N₂-N₂, N₂-H₂, CO₂-CO₂ (**species currently hardcoded**).
 * Interpolate onto model grid and store in ``XXXCIA[][]`` arrays.
 
 **Cloud Optical Property Loading:**
 
-* Call ``read_cloud_optical_tables_mie()`` from ``cloud_optics.c`` (see below section on cloud_optics.c).
+* Call ``read_cloud_optical_tables_mie()`` from ``cloud_optics.c`` (see :ref: `cloud_optics.c`).
 * Load Mie scattering lookup tables for condensible species (H₂O, NH₃, etc.) specified in ``CLOUD_SPECIES_LIST``.
 * Tables contain extinction cross-section, single-scattering albedo, and asymmetry parameter as function of particle size and wavelength.
-* Support two formats: EPACRIS format (``USE_EPACRIS_FORMAT=1``) or LX-Mie format (``USE_EPACRIS_FORMAT=0``).
+* Support two formats: EPACRIS format ``USE_EPACRIS_FORMAT=1`` or LX-Mie format ``USE_EPACRIS_FORMAT=0``.
 
 Output File Preparation
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -219,8 +208,8 @@ Initial Climate Calculation
 **Lines ~1040: First radiative-convective solve**
 
 * Call ``ms_Climate()`` or ``GreyTemp()`` depending on ``RadConv_Solver`` flag.
-* ``GreyTemp()`` (``GreyTemp.c``): Simple grey atmosphere radiative equilibrium (not recommended for detailed studies).
-* ``ms_Climate()`` (``climate.c``): Full non-grey radiative-convective solver with clouds (see :ref:`climate_solver` section).
+* ``GreyTemp()`` ``GreyTemp.c``: Simple grey atmosphere radiative equilibrium (not recommended for detailed studies).
+* ``ms_Climate()`` ``climate.c``: Full non-grey radiative-convective solver with clouds (see :ref:`climate_solver` section).
 * Returns converged temperature profile in ``tempeq[]``.
 * Copy to ``Tnew[]`` for use in subsequent iterations.
 
@@ -229,9 +218,9 @@ Climate-Chemistry Coupling Loop (NMAX iterations)
 
 **Line ~1050: Iterative convergence loop**
 
-For ``i = 0`` to ``NMAX-1``:
+After the initial radiative-convective corvengence is achieved, for ``i = 0`` to ``NMAX-1`` iterate climate-chemistry:
 
-a. **Check Convergence:**
+a. **Check Climate-Chemistry Convergence:**
    
    * Calculate mean absolute temperature change: ``TVARTOTAL``.
    * If ``TVARTOTAL < TVARTOTAL_TOL`` (typically 1 K), convergence achieved → exit loop.
@@ -239,7 +228,7 @@ a. **Check Convergence:**
 b. **Reset Arrays:**
    
    * Zero out ``clouds[][]`` array to prevent accumulation between iterations.
-   * Reset cloud optical properties to transparent state (``c = 0``, ``a = 0``, ``g = 0``).
+   * Reset cloud optical properties to transparent state ``c = 0``, ``a = 0``, ``g = 0``.
 
 c. **Update Temperature Grid:**
    
@@ -296,379 +285,436 @@ Finalization and Cleanup
   * ``cleanup_cia_cache()``: Free CIA opacity memory.
   * ``free_dmatrix()``: Free all allocated 2D arrays.
 
-* Return 0 (successful completion).
 
 .. _climate_solver:
 
-Climate Solver (climate.c)
---------------------------
+Climate Solver ``climate.c``
+----------------------------
 
-The ``ms_Climate()`` function is the core of EPACRIS and performs radiative-convective equilibrium calculations. This section describes its internal structure and operation.
+The ``ms_Climate()`` function is the core of EPACRIS, which calls on the radiative-convective equilibrium calculations. This section describes its internal structure and operation.
 
 Function Overview
 ~~~~~~~~~~~~~~~~~
 
 **Inputs:**
 
-* ``tempeq[]``: Initial temperature profile (overwritten with solution).
-* ``P[]``: Pressure grid (unchanged).
-* ``T[]``: Reference temperature profile (used for initialization).
-* ``Tint``: Internal heat flux temperature (K).
-* ``outnewtemp[]``, ``outrtdiag[]``, ``outrcdiag[]``, ``outcondiag[]``: Output file paths.
-* ``nmax_iteration``: Current NMAX iteration number (for diagnostics).
+* ``tempeq[]``: Initial temperature profile (overwritten with solution)
+* ``P[]``: Pressure grid
+* ``T[]``: Reference temperature profile
+* ``Tint``: Internal heat flux temperature
+* Output file paths for diagnostics
+* ``nmax_iteration``: Current NMAX iteration number
 
-**Outputs:**
+Initialization
+~~~~~~~~~~~~~~
 
-* Updated temperature profile in ``tempeq[]``.
-* Diagnostic files with flux profiles, heating rates, cloud properties.
-* ``clouds[][]`` array populated with condensed species abundances.
+**Line ~52: Variable initialization**
+
+* Copy temperature profile to working array ``tempb[]``
+* Recalculate Helium abundance for each layer: ``heliumnumber[j] = MM[j] - Σ xx[j][i]``
+* Initialize condensibles mode based on ``CONDENSATION_MODE`` setting
+* Detect condensible species if ``CONDENSATION_MODE = 1`` or ``2``
+* Allocate memory for saturation ratios array
+* Initialize convective layer arrays and convergence variables
+* Set up RT stop file path and live plotting directory if enabled
+* Calculate altitude grid ``znew[]`` from hydrostatic equilibrium using current temperature profile
+* Compute scale height and integrate altitude from bottom to top
 
 Radiative-Convective Iteration Loop
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Lines ~182-850: Main RC iteration loop**
+**Lines ~50: Main RC iteration loop ``ms_Climate``**
 
 The function performs ``NMAX_RC`` radiative-convective iterations. Each iteration consists of:
 
-1. **Radiative Transfer Phase** (lines ~211-422)
-2. **Convective Adjustment Phase** (lines ~427-700)
-3. **Convergence Check** (lines ~810-850)
+1. **Radiative Transfer Phase**
+2. **Convective Adjustment Phase** 
+3. **Convergence Check**
 
 **Radiative Transfer Phase:**
 
 For each RC iteration ``i``:
 
-* **Step 1: Initialize RT loop** (lines ~214-247)
-  
-  * Set RT step limit: ``RTsteplimit = NMAX_RT`` for first iteration, ``NRT_RC`` for subsequent iterations.
-  * Reset radiative flux array ``Rflux[]``.
-  * Initialize convergence status structure.
+* Set RT step limit: ``NMAX_RT`` for first iteration, ``NRT_RC`` for subsequent iterations
+* Reset radiative flux array and initialize convergence status
 
-* **Step 2: RT iteration loop** (lines ~249-422)
-  
-  * While not converged and ``RTstepcount < RTsteplimit``:
-    
-    * Increment ``RTstepcount``.
-    * **Reinterpolate opacities** (every 10 steps): Call ``reinterpolate_all_opacities()`` and ``reinterpolate_all_cia_opacities()`` to update gas opacities for current T/P profile.
-    * **Detect condensibles** (if ``CONDENSATION_MODE = 1`` or ``2``): Call ``detect_condensibles_atmosphere()`` to identify species that can condense.
-    * **Call radiative transfer solver**: ``ms_RadTrans()`` computes upward and downward fluxes at all wavelengths and layers.
-    * **Update temperature**: ``tempbnew[] = tempb[] + dt[] * heating_rate`` where ``dt[]`` is time step and heating rate is computed from flux divergence.
-    * **Check convergence**: Compute ``Rfluxmax`` (maximum residual flux), ``dRfluxmax`` (maximum flux gradient), and ``radiationO`` (net outgoing flux). Check if all convergence criteria are met.
+**Line ~245: RT iteration loop**
 
-* **Step 3: RT convergence** (lines ~400-422)
+* While not converged and ``RTstepcount < RTsteplimit``:
   
-  * Print convergence diagnostics.
-  * Proceed to convective adjustment even if RT converged (convection may still be needed).
+  * Reinterpolate opacities every 10 steps to update gas opacities for current T/P profile
+  * Detect condensibles if ``CONDENSATION_MODE = 1`` or ``2``
+  * Call ``ms_RadTrans()`` to compute upward and downward fluxes at all wavelengths and layers
+  * Update temperature from flux divergence
+  * Check convergence: compute ``Rfluxmax``, ``dRfluxmax``, and ``radiationO``
+
+* Proceed to convective adjustment if ``NMAX > 0``, if ``NMAX = 0`` proceed to ``NMAX = 1``.
 
 **Convective Adjustment Phase:**
 
-* **Step 1: Condensation and lapse rate calculation** (lines ~440-453)
+**Line ~420: Condensation and lapse rate calculation**
+
+* For each layer, call ``condensation_and_lapse_rate()`` to:
   
-  * For each layer ``j``:
-    
-    * Call ``condensation_and_lapse_rate()`` to:
-      
-      * Calculate saturation vapor pressures for all condensible species.
-      * Determine condensed mass (``clouds[j][species]``) and vapor abundance (``xx[j][species]``).
-      * Compute adiabatic lapse rate using Graham et al. (2021) formulation.
-      * Calculate heat capacity ``cp[j]`` accounting for latent heat release.
+  * Calculate saturation vapor pressures for all condensible species
+  * Determine condensed mass and vapor abundance
+  * Compute adiabatic lapse rate using Graham et al. (2021) formulation
+  * Calculate heat capacity accounting for latent heat release
 
-* **Step 2: Cloud freezing** (lines ~455-466)
+**Line ~450: Cloud freezing**
+
+* If ``FREEZE_CLOUD`` enabled and freeze condition met, store current cloud and gas abundances
+* Subsequent iterations use frozen values instead of recalculating
+
+* If ``INCLUDE_CLOUD_PHYSICS > 0``:
   
-  * If ``FREEZE_CLOUD`` is enabled and freeze condition is met:
-    
-    * Call ``freeze_cloud_state()`` to store current cloud and gas abundances for condensible species.
-    * Subsequent iterations will use frozen values instead of recalculating.
+  * Call ``cloud_redistribution_none()`` or ``exponential_cloud()`` to compute particle sizes and reshape the cloud if needed
+  * Call ``calculate_cloud_opacity_arrays()`` to interpolate cloud optical properties from Mie tables (see :ref:`cloud_optics`)
 
-* **Step 3: Cloud physics** (lines ~498-520)
-  
-  * If ``INCLUDE_CLOUD_PHYSICS > 0``:
-    
-    * Call ``cloud_redistribution_none()`` or ``exponential_cloud()`` to compute particle sizes (``particle_r0``, ``particle_r1``, ``particle_r2``) and settling velocities.
-    * Call ``calculate_cloud_opacity_arrays()`` to interpolate cloud optical properties from Mie tables.
+**Line ~515: Convective instability check and adjustment**
 
-* **Step 4: Convective instability check** (lines ~522-600)
-  
-  * Call ``ms_conv_check()`` to identify convectively unstable layers where ``dT/dP > (dT/dP)_adiabatic``.
-  * Mark unstable layers in ``isconv[]`` array.
-  * Group adjacent unstable layers into convective regions.
+* Call ``ms_conv_check()`` to identify convectively unstable layers
+* Mark unstable layers and group adjacent layers into convective regions
+* Call ``ms_temp_adj()`` to adjust temperature in unstable regions to follow adiabatic profile
+* Dry adiabat in cloud-free regions, moist adiabat in cloudy regions (see :ref:`conv_cond`)
 
-* **Step 5: Convective adjustment** (lines ~600-700)
-  
-  * Call ``ms_temp_adj()`` to adjust temperature in unstable regions to follow adiabatic profile:
-    
-    * Dry adiabat in cloud-free regions: ``dT/dP = g / (cp * ρ)``.
-    * Moist adiabat in cloudy regions: accounts for latent heat release (see :ref:`conv_cond` section).
+* Repeat convective adjustment until no new unstable layers are found
 
-* **Step 6: Iterate until stable** (lines ~432-433)
-  
-  * Repeat convective adjustment until no new unstable layers are found (``deltaconv == 0``).
+**Rainout code (not fully implemented or tested):**
 
-**Convergence Check:**
+**Line ~620:**
+* Some rainout code exists, which can selectively remove material from the atmosphere and have the alpha parameter from the adiabatic calculations readjust itself self-consistently. This code is not finished or tested.
 
-* **Step 1: Temperature change** (lines ~810-850)
-  
-  * Compute maximum temperature change between RC iterations.
-  * If change is below tolerance, convergence achieved.
+**Line ~715: Calculation of atmospheric properties for diagnostics and plotting**
 
-* **Step 2: Final output** (lines ~850-881)
-  
-  * Write diagnostic files.
-  * Copy final temperature to ``tempeq[]``.
+**Line ~790: Temperature smoothing**
 
-Radiative Transfer Solver (ms_RadTrans)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Line ~810: Temperature change**
 
-The ``ms_RadTrans()`` function (in ``ms_radtrans_test.c``) solves the wavelength-dependent radiative transfer equation:
+**Line ~850: Final output**
 
-**Algorithm:**
 
-* Uses either Toon et al. (1989) delta-2-stream method (``TWO_STR_SOLVER = 0``) or Heng et al. (2018) non-isothermal 2-stream method (``TWO_STR_SOLVER = 1``).
+Radiative Transfer Solver ``ms_RadTrans``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Line ~30: ``ms_RadTrans()`` in ``ms_radtrans_test.c``**
+
+* Uses either Toon et al. (1989) delta-2-stream method ``TWO_STR_SOLVER = 0`` or Heng et al. (2018) non-isothermal 2-stream method ``TWO_STR_SOLVER = 1``
 * For each wavelength:
   
-  * Compute optical depth: ``τ = (wa + ws) / (MM * μ_mean * g) * ΔP`` where ``wa`` is absorption coefficient, ``ws`` is scattering coefficient, ``MM`` is number density, ``μ_mean`` is mean molecular mass, ``g`` is gravity, and ``ΔP`` is pressure difference.
-  * Solve two-stream equations for upward and downward fluxes.
-  * Account for gas absorption (molecular opacities), Rayleigh scattering, collision-induced absorption, and cloud absorption/scattering.
+  * Compute optical depth from absorption and scattering coefficients
+  * Solve two-stream equations for upward and downward fluxes
+  * Account for gas absorption, Rayleigh scattering, collision-induced absorption, and cloud absorption/scattering
 
-* Compute net flux: ``F_net = F_up - F_down``.
-* Calculate heating rate: ``dT/dt = -1/(ρ * cp) * dF_net/dz``.
+* Compute net flux and calculate heating rate from flux divergence
 
 .. _conv_cond:
 
-Convection and Condensation (conv_cond_funcs.c)
--------------------------------------------------
+Convection and Condensation ``conv_cond_funcs.c``
+---------------------------------------------------
 
-The ``conv_cond_funcs.c`` module implements condensation thermodynamics, cloud microphysics, and adiabatic lapse rate calculations. This section describes its key functions.
+The ``conv_cond_funcs.c`` module implements condensation thermodynamics, cloud microphysics, and adiabatic lapse rate calculations.
 
 condensation_and_lapse_rate()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Purpose:** Calculate condensation equilibrium, cloud abundances, and adiabatic lapse rate for a single atmospheric layer.
+**Line ~138: Main function to calculate condensation equilibrium and adiabatic lapse rate**
 
 **Inputs:**
 
-* ``lay``: Layer index.
-* ``lapse[]``: Output array for adiabatic lapse rate (dT/dP).
-* ``xxHe``: Helium number density.
-* ``cp``: Output pointer for heat capacity.
-* ``saturation_ratios[]``: Output array for saturation ratios (P_vapor / P_sat).
+* ``lay``: Layer index
+* ``lapse[]``: Output array for adiabatic lapse rate (dT/dP)
+* ``xxHe``: Helium number density
+* ``cp``: Output pointer for heat capacity
+* ``saturation_ratios[]``: Output array for saturation ratios (P_vapor / P_sat)
 
-**Algorithm:**
+**Step-by-Step Algorithm for calculating condensibles and adiabatic lapse rate:**
 
-1. **Saturation vapor pressure calculation:**
-   
-   * For each condensible species ``i``, compute saturation vapor pressure ``P_sat[i]`` using species-specific functions (``ms_psat_h2o()``, ``ms_psat_nh3()``, etc.).
-   * These functions use Antoine equations or polynomial fits.
+**Step 1: Initialize variables and check cloud freezing state**
 
-2. **Condensation equilibrium:**
-   
-   * Compute partial pressure: ``P_vapor[i] = (xx[lay][i] / MM[lay]) * pl[lay]``.
-   * If ``P_vapor[i] > P_sat[i]``, condense excess: ``clouds[lay][i] = (P_vapor[i] - P_sat[i]) / P_sat[i] * xx[lay][i]``.
-   * Update vapor abundance: ``xx[lay][i] = xx[lay][i] - clouds[lay][i]``.
-   * Compute mole fractions: ``Xv[i] = xx[lay][i] / MM[lay]`` (vapor), ``Xc[i] = clouds[lay][i] / MM[lay]`` (condensed).
+* Initialize arrays for mole fractions (``Xv[]`` condensable vapor, ``Xc[]`` condensed vapor), heat capacities, latent heat, and beta parameters
+* Set ``beta[] = 0.0`` for all species initially to prevent false latent heat effects
+* Check if clouds are frozen: if ``clouds_frozen == 1``, proceed to Step 2a; otherwise proceed to Step 2b
 
-3. **Latent heat calculation:**
-   
-   * For each condensible species, compute latent heat: ``L[i] = ms_latent(species_id, T)``.
-   * Compute beta parameter: ``β[i] = L[i] / (R * T)`` where ``R`` is gas constant.
+**Step 2a: Frozen cloud mode** (if ``clouds_frozen == 1``)
 
-4. **Adiabatic lapse rate (Graham et al. 2021):**
-   
-   * Compute dry gas mole fraction: ``Xd = 1 - Σ Xv[i] - Σ Xc[i]``.
-   * Compute heat capacities: ``cp_v[i]`` (vapor), ``cp_c[i]`` (condensed), ``cp_d`` (dry gas).
-   * Compute lapse rate numerator: ``num = g * (Xd * cp_d + Σ Xv[i] * cp_v[i] + Σ Xc[i] * cp_c[i])``.
-   * Compute lapse rate denominator: ``denom = Xd * cp_d + Σ Xv[i] * cp_v[i] + Σ Xc[i] * cp_c[i] + Σ β[i] * Xv[i] * cp_v[i]``.
-   * Lapse rate: ``dT/dP = num / denom``.
+* Read frozen cloud and gas abundances directly from ``frozen_clouds[][]`` and ``frozen_xx[][]`` arrays
+* Convert to mole fractions: ``Xc[i] = frozen_clouds[lay][species] / MM[lay]``, ``Xv[i] = frozen_xx[lay][species] / MM[lay]``
+* Ensure vapor is at saturation if clouds exist: if ``Xc[i] > 0``, set ``Xv[i] = Xv_sat[i]`` for correct latent heat calculation
+* Calculate dry gas mole fraction: ``Xd = 1.0 - Σ(Xv[i] + Xc[i])``
+* Skip condensation calculation and proceed to Step 3
 
-5. **Heat capacity:**
-   
-   * ``cp = denom / (Xd + Σ Xv[i] + Σ Xc[i])``.
+**Step 2b: Normal condensation mode** (if ``clouds_frozen == 0``)
+
+* **For each condensible species ``i``:**
+  
+  * **Saturation vapor pressure:** Compute ``psat[i]`` using species-specific functions (``ms_psat_h2o()``, ``ms_psat_nh3()``, etc.) based on layer temperature ``tl[lay]``
+  
+  * **Current state:** Read existing cloud and vapor abundances: ``Xc[i] = clouds[lay][species] / MM[lay]``, ``Xv[i] = xx[lay][species] / MM[lay]``
+  
+  * **Total condensible:** Calculate ``Xtotal = Xv[i] + Xc[i]`` (total material available)
+  
+  * **Cold trapping** (if ``ENABLE_COLD_TRAP``):
+    
+    * Check all layers below for condensation of this species
+    * If condensation found below, find minimum gas-phase abundance in condensing layers
+    * Limit ``Xtotal`` to this minimum value to simulate efficient removal by settling
+    * Apply "ghost cold trap fix": if current layer has no condensation but VMR is lower than layer below, set ``Xtotal = gas_below`` to fix artificial reductions
+  
+  * **Equilibrium partitioning:**
+    
+    * Calculate saturation mole fraction: ``Xv_sat = psat[i] / pl[lay]``
+    * If ``Xtotal > Xv_sat`` (supersaturated):
+      
+      * Set vapor to saturation: ``Xv[i] = Xv_sat``
+      * Condense excess: ``Xc[i] = Xtotal - Xv_sat``
+    
+    * If ``Xtotal ≤ Xv_sat`` (undersaturated):
+      
+      * All material in vapor phase: ``Xv[i] = Xtotal``, ``Xc[i] = 0.0``
+  
+  * **Dry gas fraction:** Update ``Xd -= Xv[i] + Xc[i]``
+
+**Step 3: Calculate heat capacities**
+
+* **Dry species heat capacity:**
+  
+  * Initialize ``cpxx_dry = 0.0`` and ``MM_dry = 0.0``
+  * Add Helium contribution: ``cpxx_dry += xxHe * HeHeat(tl[lay])``, ``MM_dry += xxHe``
+  * For each non-condensible species with heat capacity functions (H2O, NH3, CO, CH4, etc. if not in condensibles list), add their contributions
+  * Calculate dry heat capacity: ``cp_d = cpxx_dry / MM_dry``
+
+* **Condensible species heat capacities:**
+  
+  * For each condensible species, look up vapor and condensed heat capacities using temperature-dependent functions:
+    
+    * ``cp_v[i]``: Vapor-phase heat capacity (e.g., ``H2OHeat()``, ``NH3Heat()``)
+    * ``cp_c[i]``: Condensed-phase heat capacity (e.g., ``H2O_liquid_heat_capacity()``, ``NH3_liquid_heat_capacity()``)
+  
+  * Get cloud retention factor: ``alpha[i] = get_global_alpha_value(lay, i)`` (layer-dependent, accounts for rainout/sedimentation)
+
+**Step 4: Calculate latent heat and beta parameter**
+
+* **For each condensible species:**
+  
+  * Calculate latent heat: ``latent[i] = ms_latent(species_id, tl[lay])`` (temperature-dependent)
+  
+  * **Beta parameter calculation** (critical for lapse rate):
+    
+    * Compute partial pressure: ``partial_pressure = Xv[i] * pl[lay]``
+    * Get critical temperature ``T_crit`` for species (e.g., H2O: 647.1 K, NH3: 405.5 K)
+    * **If ``partial_pressure ≥ psat[i]`` AND ``tl[lay] < T_crit``:**
+      
+      * Condensation is occurring: ``beta[i] = latent[i] / (R_GAS * tl[lay])``
+      * This accounts for latent heat release in lapse rate
+    
+    * **Otherwise** (undersaturated or above critical temperature):
+      
+      * No condensation: ``beta[i] = 0.0``
+      * Species treated as dry (no latent heat effect)
+
+**Step 5: Calculate adiabatic lapse rate** (Graham et al. 2021, Equation 1)
+
+* **Lapse rate numerator:** ``lapse_num = Xd + Σ Xv[i]`` (dry gas + all vapor phases)
+
+* **Lapse rate denominator:** 
+  
+  * Calculate ``sum_beta_xv = Σ(beta[i] * Xv[i])`` (latent heat contribution)
+  * Calculate ``big_sum_denom_num_left_term = cp_d * Xd`` (dry gas heat capacity contribution)
+  * Calculate ``big_sum_denom_num_right_term = Σ(Xv[i] * (cp_v[i] - R_GAS*beta[i] + R_GAS*beta[i]²) + alpha[i] * Xc[i] * cp_c[i])`` (vapor and condensed heat capacity contributions)
+  * Lapse rate denominator: ``lapse_denom = Xd * (big_sum_denom_num_left_term + big_sum_denom_num_right_term) / (R_GAS * (Xd + sum_beta_xv)) + sum_beta_xv``
+
+* **Final lapse rate:** ``lapse[lay] = lapse_num / lapse_denom``
+
+**Step 6: Calculate heat capacity**
+
+* **Heat capacity numerator:** ``cp_num = cp_d * Xd + Σ(Xv[i] * cp_v[i] + alpha[i] * Xc[i] * cp_c[i])``
+* **Heat capacity denominator:** ``cp_denom = Xd + Σ Xv[i]`` (only dry gas and vapor, not condensed)
+* **Return heat capacity:** ``*cp = cp_num / cp_denom``
+
+**Step 7: Update global arrays** (only if not frozen)
+
+* **If ``clouds_frozen == 0``:**
+  
+  * Update vapor abundances: ``xx[lay][species] = Xv[i] * MM[lay]``
+  * Update cloud abundances: ``clouds[lay][species] = Xc[i] * MM[lay]``
+  
+* **Calculate saturation ratios:** ``saturation_ratios[i] = (Xv[i] * pl[lay]) / psat[i]`` for diagnostic output
 
 **Cloud Freezing:**
 
-* If ``clouds_frozen == 1`` (clouds are frozen):
-  
-  * Read ``Xc[i]`` and ``Xv[i]`` from frozen arrays instead of calculating.
-  * Ensure ``Xv[i] = Xv_sat[i]`` if ``Xc[i] > 0`` for correct latent heat calculation.
-  * Do not update global ``xx[][]`` or ``clouds[][]`` arrays.
-
-* If ``clouds_frozen == 0``:
-  
-  * Perform normal condensation calculation.
-  * Update global arrays.
+* When ``FREEZE_CLOUD`` is enabled and freeze condition is met, the function reads from frozen arrays instead of calculating condensation
+* This preserves cloud state across iterations while still allowing correct lapse rate calculations
+* Global arrays are not modified when frozen, ensuring consistency
 
 calculate_cloud_properties()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Purpose:** Calculate cloud particle sizes and settling velocities using microphysics from Hu et al. (2019).
+**Line ~847: Calculate cloud particle sizes and settling velocities using Hu et al. (2019) microphysics**
 
-**Inputs:**
+**Inputs:** Gravitational acceleration, temperature, pressure, mean molecular mass, species ID, eddy diffusion coefficient, layer index
 
-* ``g``: Gravitational acceleration.
-* ``T``, ``P``: Temperature and pressure.
-* ``mean_molecular_mass``: Mean molecular mass of atmosphere.
-* ``condensible_species_id``: Species ID (e.g., 7 for H₂O).
-* ``Kzz``: Eddy diffusion coefficient.
-* ``layer``: Layer index.
+**Outputs:** Particle radii ``r0``, ``r1``, ``r2``, volume, settling velocity, scale height, mass, number density
 
-**Outputs:**
+**Step-by-Step Algorithm:**
 
-* ``r0``: Mode radius (nucleation/monomer radius) in μm.
-* ``r1``: Surface-area-weighted radius in μm (used for cloud optics).
-* ``r2``: Volume-weighted radius in μm.
-* ``VP``: Particle volume in cm³.
-* ``effective_settling_velocity``: Gravitational settling velocity in m/s.
-* ``scale_height``: Cloud scale height.
-* ``mass_per_particle``: Particle mass in kg.
-* ``n_density``: Particle number density in particles/m³.
+**Step 1: Get species-specific properties**
 
-**Algorithm:**
+* Look up material properties: particle density ``rho`` (kg/m³), accommodation coefficient ``acc``, molecular mass ``molecular_mass_condensible`` (AMU)
+* Properties depend on species and temperature (e.g., H2O: liquid 1000 kg/m³, ice 917 kg/m³)
 
-1. **Get particle properties:**
-   
-   * Look up material density, accommodation coefficient, and molecular mass for species.
+**Step 2: Calculate atmospheric properties**
 
-2. **Particle growth equation:**
-   
-   * Solve balance between growth (condensation) and evaporation: ``dr/dt = α * v_th * (P_vapor - P_sat) / (4 * ρ_particle)`` where ``α`` is accommodation coefficient and ``v_th`` is thermal velocity.
-   * Compute equilibrium radius ``r0`` from growth/sedimentation balance.
+* **Atmospheric scale height:** ``H = k_B * T / (mean_molecular_mass * AMU * g)`` (m)
+* **Dimensionless fall parameter:** ``u = Kzz / H`` (ratio of diffusion to settling)
+* **Atmospheric viscosity:** Calculate using Sutherland's formula with composition-dependent constants (H2, Air, CO2, N2, etc.)
+* **Mean free path:** ``λ = 2μ / (P * √(8*mean_molecular_mass/(πRT)))`` (m)
+* **Excess number density:** ``deltan = DELTA_P / (k_B * T)`` (molecules/m³) - supersaturation driving condensation
 
-3. **Size distribution moments:**
-   
-   * Assuming log-normal distribution, compute ``r1`` and ``r2`` from ``r0`` and distribution width.
+**Step 3: Iterative solution for equilibrium particle size**
 
-4. **Settling velocity:**
-   
-   * Compute Stokes drag: ``v_settle = (2/9) * g * ρ_particle * r² / (η * f_Knudsen)`` where ``η`` is dynamic viscosity and ``f_Knudsen`` is Knudsen correction factor.
+* **Initialize:** Set Cunningham slip correction ``Cc0 = 1.0``, ventilation factor ``fa = 1.0``, distribution width ``sig = 2.0``
+* **Iterate until convergence** (up to 1000 iterations):
+  
+  * **Condensation term:** ``cc = -48^(1/3) * π^(2/3) * D * molecular_mass * fa * deltan / rho * exp(-ln²(σ))`` (growth rate)
+  * **Settling term:** ``aa = rho * g / (μ * 162^(1/3) * π^(2/3) * H) * Cc * exp(-ln²(σ))`` (settling velocity coefficient)
+  * **Diffusion term:** ``bb = -u / H`` (turbulent mixing opposes settling)
+  * **Solve quadratic:** ``V = [(-bb + √(bb² - 4*aa*cc)) / (2*aa)]^(3/2)`` for equilibrium volume
+  * **Handle updraft-dominated case:** If no real solution, use asymptotic solution ``V = 39.9 * [μ*u*exp(ln²σ)/(ρ*g*Cc)]^(3/2)``
+  * **Update slip corrections:**
+    
+    * Calculate Knudsen number: ``Kn = λ / d`` where ``d = (6V/π)^(1/3) * exp(-ln²(σ))``
+    * Update Cunningham correction: ``Cc1 = 1 + Kn*(1.257 + 0.4*exp(-1.1/Kn))``
+    * Update ventilation factor: ``fa1 = (1 + Kn) / (1 + 2*Kn*(1+Kn)/acc)``
+  
+  * **Check convergence:** If ``|Cc1 - Cc0| + |fa1 - fa| < 0.001``, exit loop
 
-5. **Cloud retention:**
-   
-   * Compute retention factor from balance of sedimentation and mixing: ``H_cloud / H_gas = Kzz / (v_settle * H_gas)``.
+**Step 4: Calculate particle size distribution moments**
+
+* **Mode radius (r0):** ``r0 = (3V/(4π))^(1/3) * exp(-1.5*ln²(σ)) * 1e6`` (μm) - smallest particles, nucleation radius
+* **Surface-area-weighted radius (r1):** ``r1 = (3V/(4π))^(1/3) * exp(-ln²(σ)) * 1e6`` (μm) - used for cloud optics
+* **Volume-weighted radius (r2):** ``r2 = (3V/(4π))^(1/3) * exp(-0.5*ln²(σ)) * 1e6`` (μm) - largest particles, used for sedimentation
+
+**Step 5: Calculate settling velocity**
+
+* **Hu+2019 formula:** ``v_fall = (ρ*g*Cc) / ((162π²)^(1/3) * μ) * V^(2/3) * exp(-ln²(σ))`` (m/s)
+* **Apply correction:** ``v_d = max(v_fall - u, 0)`` (accounts for turbulent mixing)
+* **Alternative Stokes law:** ``v_settle = 2*r²*ρ*g*Cc/(9*μ)`` (verification, gives same result)
+
+**Step 6: Calculate particle number density**
+
+* **Mass per particle:** ``mass_per_particle = V * rho`` (kg)
+* **Molecules per particle:** ``molecules_per_particle = mass_per_particle / (molecular_mass * AMU)``
+* **Particle number density:** ``n_density = (clouds[layer][species] / molecules_per_particle) * 1e6`` (particles/m³)
+
+**Step 7: Return outputs**
+
+* Return particle radii ``r0``, ``r1``, ``r2`` (μm), volume ``VP`` (cm³), settling velocity (m/s), scale height (m), mass (kg), number density (particles/m³)
 
 cloud_redistribution_none() and exponential_cloud()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Purpose:** Redistribute cloud particles vertically based on transport physics.
+**Line ~1951: Redistribute cloud particles vertically**
 
-**cloud_redistribution_none()** (``INCLUDE_CLOUD_PHYSICS = 1``):
+**cloud_redistribution_none()** ``INCLUDE_CLOUD_PHYSICS = 1``:
 
-* No vertical redistribution - clouds remain where they condense.
-* Simply computes particle sizes using ``calculate_cloud_properties()``.
+* **No vertical redistribution** - clouds remain exactly where they condense
+* For each layer and condensible species:
+  
+  * Call ``calculate_cloud_properties()`` to compute particle sizes and settling velocities
+  * Store particle radii in ``particle_r0[][]``, ``particle_r1[][]``, ``particle_r2[][]`` arrays
+  * Store particle number density in ``particle_number_density[][]`` array
+  * Cloud abundances remain unchanged from condensation calculation
 
-**exponential_cloud()** (``INCLUDE_CLOUD_PHYSICS = 2``):
+**exponential_cloud()** ``INCLUDE_CLOUD_PHYSICS = 2``:
 
-* Redistributes clouds with exponential decay: ``n_cloud(z) = n_cloud(z_condense) * exp(-(z - z_condense) / H_cloud)``.
-* Conserves total condensed mass.
-* Returns excess condensate to vapor phase in upper layers.
+* **Hybrid A&M (2001) + Hu+2019 transport physics:**
+  
+  * **Step 1:** Store original condensed distribution from ``condensation_and_lapse_rate()``
+  * **Step 2:** For each condensible species independently:
+    
+    * Find cloud bottom layer (highest pressure with significant condensation)
+    * Calculate particle properties using ``calculate_cloud_properties()`` at each layer
+    * Apply A&M transport physics: redistribute condensate with exponential decay based on settling velocity and eddy diffusion
+    * Calculate cloud scale height: ``H_cloud = Kzz / v_settle``
+    * Redistribute: ``n_cloud(z) = n_cloud(z_bottom) * exp(-(z - z_bottom) / H_cloud)``
+  
+  * **Step 3:** Conserve total mass - return excess condensate to vapor phase in upper layers
+  * **Step 4:** Update ``clouds[][]`` and ``xx[][]`` arrays with new distribution
 
 ms_conv_check() and ms_temp_adj()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Purpose:** Identify convectively unstable layers and adjust temperature to adiabatic profile.
+**Line ~588: Identify and adjust convectively unstable layers**
 
 **ms_conv_check()**:
 
-* For each layer, compare ``dT/dP`` to adiabatic lapse rate ``lapse[j]``.
-* If ``dT/dP > lapse[j]``, mark layer as convective (``isconv[j] = 1``).
-* Group adjacent convective layers into regions.
+* **For each layer:**
+  
+  * Calculate actual temperature gradient: ``dT/dP`` from current temperature profile
+  * Compare to adiabatic lapse rate ``lapse[j]`` calculated by ``condensation_and_lapse_rate()``
+  * **If ``dT/dP > lapse[j]``:** Mark layer as convectively unstable (``isconv[j] = 1``)
+  * **Otherwise:** Mark as radiative (``isconv[j] = 0``)
+
+* **Group adjacent unstable layers:** Identify contiguous convective regions for efficient adjustment
 
 **ms_temp_adj()**:
 
-* For each convective region, adjust temperature to follow adiabatic profile:
+* **For each convective region:**
   
-  * ``T_new = T_ref * (P_new / P_ref)^(R / (cp * μ_mean))`` for dry adiabat.
-  * For moist adiabat, account for latent heat release (computed in ``condensation_and_lapse_rate()``).
+  * **Dry adiabat** (cloud-free regions): ``T_new = T_ref * (P_new / P_ref)^(R / (cp * μ_mean))``
+  * **Moist adiabat** (cloudy regions): Adjust temperature to follow adiabatic profile accounting for latent heat release
+  
+  * The adiabatic profile is calculated from ``lapse[j]`` which already accounts for:
+    
+    * Dry gas heat capacity
+    * Vapor-phase heat capacity
+    * Condensed-phase heat capacity (with retention factor alpha)
+    * Latent heat release (beta parameter)
 
-Cloud Optics (cloud_optics.c)
-------------------------------
+* **Iterate:** Repeat convective adjustment until no new unstable layers are found (``deltaconv == 0``)
+
+.. _cloud_optics:
+
+Cloud Optics ``cloud_optics.c``
+--------------------------------
 
 The ``cloud_optics.c`` module handles reading Mie scattering lookup tables and computing cloud optical properties for radiative transfer.
 
 read_cloud_optical_tables_mie()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Purpose:** Load Mie scattering lookup tables for all cloud species specified in ``CLOUD_SPECIES_LIST``.
+**Line ~472: Load Mie scattering lookup tables**
 
-**Algorithm:**
-
-1. **Determine format:**
-   
-   * If ``USE_EPACRIS_FORMAT = 1``: Read EPACRIS format files (``Albedo.dat``, ``Cross.dat``, ``Geo.dat``).
-   * If ``USE_EPACRIS_FORMAT = 0``: Read LX-Mie format files (``r0.010000.dat``, ``r0.012589.dat``, etc.).
-
-2. **EPACRIS format:**
-   
-   * For each species, read three files:
-     
-     * ``Albedo.dat``: Single-scattering albedo [particle_size][wavelength].
-     * ``Cross.dat``: Extinction cross-section (cm²) [particle_size][wavelength].
-     * ``Geo.dat``: Asymmetry parameter [particle_size][wavelength].
-   
-   * Particle sizes and wavelengths are specified in file headers.
-
-3. **LX-Mie format:**
-   
-   * Scan directory for files matching pattern ``r*.dat``.
-   * Extract particle radius from filename.
-   * Read each file: wavelength (μm), size_param, extinction (cm²), scattering (cm²), absorption (cm²), albedo, asymmetry_g.
-   * Sort files by particle radius.
-
-4. **Store in global arrays:**
-   
-   * Store tables in ``cloud_mie_optics[]`` array (one entry per cloud species).
-   * Store species IDs in ``cloud_species_ids[]`` array.
+* Determine format: EPACRIS format ``USE_EPACRIS_FORMAT = 1`` or LX-Mie format ``USE_EPACRIS_FORMAT = 0``
+* **EPACRIS format:** Read three files per species: ``Albedo.dat``, ``Cross.dat``, ``Geo.dat``
+* **LX-Mie format:** Scan directory for ``r*.dat`` files, extract particle radius from filename, read optical properties
+* Store tables in ``cloud_mie_optics[]`` array for each cloud species in ``CLOUD_SPECIES_LIST``
 
 calculate_cloud_opacity_arrays()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Purpose:** Compute cloud optical properties (extinction coefficient, albedo, asymmetry parameter) for all layers and wavelengths using Mie tables.
+**Line ~788: Compute cloud optical properties**
 
-**Algorithm:**
+* For each cloud species and layer:
+  
+  * If cloud density very small, set opacity to zero and continue
+  * Get particle radius ``particle_r2`` and particle number density
 
-1. **Loop over cloud species:**
-   
-   * For each loaded cloud species (e.g., H₂O, NH₃).
+* For each wavelength:
+  
+  * Interpolate in particle size dimension using log-space interpolation
+  * Interpolate in wavelength dimension linearly
+  * Handle out-of-range values by clamping to table limits
 
-2. **Loop over layers:**
-   
-   * For each layer ``j``:
-     
-     * If ``clouds[j][species_id] < 1e-12``: Set opacity to zero, albedo to 1.0, asymmetry to 0.0, continue.
-     * Get particle radius: ``r = particle_r2[j][species_idx]`` (volume-weighted radius).
-     * Get particle number density: ``n = particle_number_density[j][species_idx]`` (particles/m³).
-
-3. **Loop over wavelengths:**
-   
-   * For each wavelength ``i`` in RT grid:
-     
-     * **Interpolate in particle size dimension:**
-       
-       * Find bounding particle sizes in Mie table: ``r_low <= r <= r_high``.
-       * Interpolate extinction cross-section, albedo, and asymmetry parameter using log-space interpolation.
-       * Handle out-of-range values by clamping to table limits.
-     
-     * **Interpolate in wavelength dimension:**
-       
-       * Convert RT wavelength (nm) to Mie wavelength (μm).
-       * Find bounding wavelengths in Mie table.
-       * Interpolate optical properties linearly in wavelength.
-       * Handle out-of-range values by using nearest table value.
-
-4. **Compute opacity:**
-   
-   * Extinction coefficient: ``c[j][i] = n * σ_ext`` where ``σ_ext`` is extinction cross-section (cm²) and ``n`` is converted to particles/cm³.
-   * Albedo: ``a[j][i] = albedo_interpolated``.
-   * Asymmetry: ``g[j][i] = asymmetry_interpolated``.
-
-5. **Write to output arrays:**
-   
-   * Store in species-specific arrays: ``cH2O[][]``, ``aH2O[][]``, ``gH2O[][]``, etc.
+* Compute opacity: ``c[j][i] = n * σ_ext`` where ``n`` is particle number density and ``σ_ext`` is extinction cross-section
+* Store in species-specific arrays: ``cH2O[][]``, ``aH2O[][]``, ``gH2O[][]``, etc.
 
 **Units:**
 
-* Extinction coefficient ``c``: cm⁻¹ (opacity per unit path length).
-* Albedo ``a``: dimensionless (0 = pure absorption, 1 = pure scattering).
-* Asymmetry parameter ``g``: dimensionless (-1 = backward scattering, 0 = isotropic, 1 = forward scattering).
+* Extinction coefficient ``c``: cm⁻¹
+* Albedo ``a``: dimensionless (0 = pure absorption, 1 = pure scattering)
+* Asymmetry parameter ``g``: dimensionless (-1 = backward, 0 = isotropic, 1 = forward scattering)
 
 Global Variables Reference
 ---------------------------

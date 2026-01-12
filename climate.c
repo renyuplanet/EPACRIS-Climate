@@ -205,9 +205,6 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
         // }
         // printf("\n");
 
-
-
-
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         //Radiative Transfer iteration
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -465,11 +462,6 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
                 }
             }
             
-            // Restore frozen state after condensation loop if frozen
-            // // This ensures arrays stay consistent with frozen state (in case of any modifications)
-            // if (FREEZE_CLOUD && are_clouds_frozen()) {
-            //     restore_frozen_clouds();
-            // }
             
             // Recalculate heliumnumber after condensation (xx changes when gas condenses)
             // This ensures heliumnumber accounts for material moved from gas (xx) to clouds
@@ -484,6 +476,7 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
                 }
             }
 
+            // Debugging code to print cloud abundances
             // printf("CLOUD ABUNDANCES:\n");
             // //print cloud abundances
             // for (j=1; j<=zbin; j++) {
@@ -519,9 +512,10 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
             ncl = 0;
             nrl = 0;
 
-            /* determine convection, and record convective layers */
+            // Determine convection, and record convective layers
             ms_conv_check(tempb, P, lapse, isconv, &ncl, &nrl); //ms22: check convective layers
 
+            // Debugging code
             // // Check if single layers are causing issues with spiking
             // //          printf("%s %d %s %d\n", "ncl", ncl, "nrl", nrl);
             //  // remove single radiative layer between convective layers
@@ -534,15 +528,16 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
             //     }
 
         
+            // Old code that could be beneficial
             // remove single convective layer between radiative layers
-    /*          for (j=2; j<zbin; j++) { //rh->ms 2021
+            /*for (j=2; j<zbin; j++) { //rh->ms 2021
                     if (isconv[j]==1 && (isconv[j+1]==0 && isconv[j-1]==0)) {
                         isconv[j]=0;
                         ncl = ncl-1;
                         nrl = nrl+1;
                     }
                 }
-    */        
+             */        
     
 
             if(ncl>=0) ms_temp_adj(tempb, P, lapse, isconv, cp, ncreg, pot_temp); //ms22: assign convective regimes, adjust temperatures
