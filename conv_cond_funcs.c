@@ -554,12 +554,15 @@ void condensation_and_lapse_rate(int lay, double lapse[], double xxHe, double* c
     
     // Set the gas and cloud abundances based on current equilibrium
     // If frozen, don't modify arrays - only update for non-frozen case
+    if (!clouds_frozen) {
+        for (i=0; i<NCONDENSIBLES; i++) {
+            xx[lay][CONDENSIBLES[i]] = Xv[i] * MM[lay];
+            clouds[lay][CONDENSIBLES[i]] = Xc[i] * MM[lay];
+        }
+    }
+    
+    // Calculate and store saturation ratios for plotting (always done, even when frozen)
     for (i=0; i<NCONDENSIBLES; i++) {
-
-        xx[lay][CONDENSIBLES[i]] = Xv[i] * MM[lay];
-        clouds[lay][CONDENSIBLES[i]] = Xc[i] * MM[lay];
-   
-        // Calculate and store saturation ratios for plotting
         // saturation_ratio = partial_pressure / saturation_pressure
         double partial_pressure = Xv[i] * pl[lay];
         if (psat[i] > 0.0) {

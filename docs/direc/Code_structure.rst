@@ -436,15 +436,14 @@ condensation_and_lapse_rate()
 * Set ``beta[] = 0.0`` for all species initially to prevent false latent heat effects
 * Check if clouds are frozen: if ``clouds_frozen == 1``, proceed to Step 2a; otherwise proceed to Step 2b
 
-**Step 2a: Frozen cloud mode** (if ``clouds_frozen == 1``)
+**Step 2a: Frozen cloud mode** if ``clouds_frozen == 1``
 
 * Read frozen cloud and gas abundances directly from ``frozen_clouds[][]`` and ``frozen_xx[][]`` arrays
 * Convert to mole fractions: ``Xc[i] = frozen_clouds[lay][species] / MM[lay]``, ``Xv[i] = frozen_xx[lay][species] / MM[lay]``
-* Ensure vapor is at saturation if clouds exist: if ``Xc[i] > 0``, set ``Xv[i] = Xv_sat[i]`` for correct latent heat calculation
 * Calculate dry gas mole fraction: ``Xd = 1.0 - Σ(Xv[i] + Xc[i])``
 * Skip condensation calculation and proceed to Step 3
 
-**Step 2b: Normal condensation mode** (if ``clouds_frozen == 0``)
+**Step 2b: Normal condensation mode** if ``clouds_frozen == 0``
 
 * **For each condensible species ``i``:**
   
