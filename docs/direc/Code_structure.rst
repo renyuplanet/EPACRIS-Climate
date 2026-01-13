@@ -480,8 +480,8 @@ condensation_and_lapse_rate()
   
   * Initialize ``cpxx_dry = 0.0`` and ``MM_dry = 0.0``
   * Add Helium contribution: ``cpxx_dry += xxHe * HeHeat(tl[lay])``, ``MM_dry += xxHe``
-  * For each non-condensible species with heat capacity functions (H2O, NH3, CO, CH4, etc. if not in condensibles list), add their contributions
-  * Calculate dry heat capacity: ``cp_d = cpxx_dry / MM_dry``
+  * For each non-condensible species with heat capacity functions (CO, CH4, etc. if not in condensibles list), add their contributions
+  * Calculate average dry heat capacity: ``cp_d = cpxx_dry / MM_dry``
 
 * **Condensible species heat capacities:**
   
@@ -490,7 +490,7 @@ condensation_and_lapse_rate()
     * ``cp_v[i]``: Vapor-phase of condensible species heat capacity (e.g., ``H2OHeat()``, ``NH3Heat()``)
     * ``cp_c[i]``: Condensed-phase heat capacity (e.g., ``H2O_liquid_heat_capacity()``, ``NH3_liquid_heat_capacity()``)
   
-  * Get cloud retention factor: ``alpha[i] = get_global_alpha_value(lay, i)`` (layer-dependent, accounts for rainout/sedimentation)
+  * Read cloud retention factor for each species: ``alpha[i] = get_global_alpha_value(lay, i)`` (layer-dependent, accounts for rainout/sedimentation)
 
 **Step 4: Calculate latent heat and beta parameter**
 
@@ -500,7 +500,7 @@ condensation_and_lapse_rate()
   
   * **Beta parameter calculation** (critical for lapse rate):
     
-    * Compute partial pressure: ``partial_pressure = Xv[i] * pl[lay]``
+    * Compute partial pressure of a condesible species in the layer: ``partial_pressure = Xv[i] * pl[lay]``
     * Get critical temperature ``T_crit`` for species (e.g., H2O: 647.1 K, NH3: 405.5 K)
     * **If ``partial_pressure ≥ psat[i]`` AND ``tl[lay] < T_crit``:**
       
@@ -512,7 +512,7 @@ condensation_and_lapse_rate()
       * No condensation: ``beta[i] = 0.0``
       * Species treated as dry (no latent heat effect)
 
-**Step 5: Calculate adiabatic lapse rate** (Graham et al. 2021, Equation 1)
+**Step 5: Calculate adiabatic lapse rate** (Following Graham et al. 2021, Equation 1)
 
 * **Lapse rate numerator:** ``lapse_num = Xd + Σ Xv[i]`` (dry gas + all vapor phases)
 
@@ -531,7 +531,7 @@ condensation_and_lapse_rate()
 * **Heat capacity denominator:** ``cp_denom = Xd + Σ Xv[i]`` (only dry gas and vapor, not condensed)
 * **Return heat capacity:** ``*cp = cp_num / cp_denom``
 
-**Step 7: Update global arrays** (only if not frozen)
+**Step 7: Update global abundance arrays** (only if clouds are not frozen via ``FREEZE_CLOUD``)
 
 * **If ``clouds_frozen == 0``:**
   

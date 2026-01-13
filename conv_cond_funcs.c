@@ -465,7 +465,6 @@ void condensation_and_lapse_rate(int lay, double lapse[], double xxHe, double* c
         // Calculate latent heat of the condensible species
         latent[i] = ms_latent(CONDENSIBLES[i],tl[lay]);
         
-        // CORRECT APPROACH - following JANUS logic exactly
         // β is ONLY applied when condensation is actively occurring (P ≥ P_sat)
         // When P < P_sat, species is treated as dry (β = 0, no latent heat effect)
         double partial_pressure = Xv[i] * pl[lay];
@@ -836,16 +835,13 @@ void get_particle_properties(int species_id, double temperature, double *density
     }
 }
 
-//particlesizef function from Kyo
+
 // PARTICLE SIZE CALCULATION USING MICROPHYSICAL BALANCE
 // This function calculates equilibrium particle sizes by balancing:
 // 1) Condensational growth (mass diffusion from supersaturated vapor)
 // 2) Gravitational settling (particles fall due to gravity)
 // 3) Eddy diffusion (turbulent mixing opposes settling)
-//
-// Core Physics: Particles grow until fall velocity balances with diffusion
-// Key Equation: u = v_fall * H / K_zz (dimensionless fall parameter)
-// Where: H = scale height [m], K_zz = eddy diffusion coefficient [m²/s]
+// Particles grow until fall velocity balances with diffusion
 void calculate_cloud_properties(double g, double T, double P, double mean_molecular_mass, int condensible_species_id, 
     double Kzz, int layer, double *r0, double *r1, double *r2, double *VP, double *effective_settling_velocity,
      double *scale_height, double *mass_per_particle, double *n_density) {
