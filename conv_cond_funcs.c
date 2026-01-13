@@ -354,7 +354,7 @@ void condensation_and_lapse_rate(int lay, double lapse[], double xxHe, double* c
     //*=========Heat capacities, condensate retention, latent heat=============*//
     //=======================================================================*//
 
-    // CORRECTED APPROACH: Calculate heat capacities separately for each phase
+    // Calculate heat capacities separately for each phase
     // following Graham+2021 methodology exactly
     
     // STEP 1: Calculate heat capacity of TRULY DRY (non-condensible) species only
@@ -367,7 +367,6 @@ void condensation_and_lapse_rate(int lay, double lapse[], double xxHe, double* c
     
     // Add other species that are NOT in the condensibles list
     // This ensures we only count truly non-condensible species as "dry"
-    
     // Check each species to see if it's condensible
     bool is_condensible[NSP+1] = {false}; // Initialize all to false
     for (i=0; i<NCONDENSIBLES; i++) {

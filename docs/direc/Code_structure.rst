@@ -440,7 +440,7 @@ condensation_and_lapse_rate()
 
 * Read frozen cloud and gas abundances directly from ``frozen_clouds[][]`` and ``frozen_xx[][]`` arrays
 * Convert to mole fractions: ``Xc[i] = frozen_clouds[lay][species] / MM[lay]``, ``Xv[i] = frozen_xx[lay][species] / MM[lay]``
-* Calculate dry gas mole fraction: ``Xd = 1.0 - Σ(Xv[i] + Xc[i])``
+* Calculate dry gas mole fraction: ``Xd -= Xv[i] + Xc[i]``
 * Skip condensation calculation and proceed to Step 3
 
 **Step 2b: Normal condensation mode** if ``clouds_frozen == 0``
@@ -451,7 +451,7 @@ condensation_and_lapse_rate()
   
   * **Current state:** Read existing cloud and vapor abundances: ``Xc[i] = clouds[lay][species] / MM[lay]``, ``Xv[i] = xx[lay][species] / MM[lay]``
   
-  * **Total condensible:** Calculate ``Xtotal = Xv[i] + Xc[i]`` (total material available)
+  * **Total condensible:** Calculate ``Xtotal = Xv[i] + Xc[i]`` (total condensible material available)
   
   * **Cold trapping** (if ``ENABLE_COLD_TRAP``):
     
@@ -487,7 +487,7 @@ condensation_and_lapse_rate()
   
   * For each condensible species, look up vapor and condensed heat capacities using temperature-dependent functions:
     
-    * ``cp_v[i]``: Vapor-phase heat capacity (e.g., ``H2OHeat()``, ``NH3Heat()``)
+    * ``cp_v[i]``: Vapor-phase of condensible species heat capacity (e.g., ``H2OHeat()``, ``NH3Heat()``)
     * ``cp_c[i]``: Condensed-phase heat capacity (e.g., ``H2O_liquid_heat_capacity()``, ``NH3_liquid_heat_capacity()``)
   
   * Get cloud retention factor: ``alpha[i] = get_global_alpha_value(lay, i)`` (layer-dependent, accounts for rainout/sedimentation)
