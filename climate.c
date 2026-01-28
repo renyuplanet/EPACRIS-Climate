@@ -493,11 +493,11 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
             if (INCLUDE_CLOUD_PHYSICS == 0) {
                 // No cloud physics calculation
             } else if (INCLUDE_CLOUD_PHYSICS == 1) {
-                cloud_redistribution_none(GA, P); // Calculate physics without redistribution
+                cloud_redistribution_none(P); // Calculate physics without redistribution
                 // particle_number_density is populated globally, no copy needed
             } else if (INCLUDE_CLOUD_PHYSICS == 2) {
                 // exponential_cloud populates global particle_number_density array
-                exponential_cloud(GA, P, NULL); // Parameter unused, uses global array
+                exponential_cloud(P, NULL); // Parameter unused, uses global array
             }
             
             // Calculate cloud optical properties from particle sizes and densities

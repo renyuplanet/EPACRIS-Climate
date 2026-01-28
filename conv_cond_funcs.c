@@ -842,7 +842,7 @@ void get_particle_properties(int species_id, double temperature, double *density
 // 2) Gravitational settling (particles fall due to gravity)
 // 3) Eddy diffusion (turbulent mixing opposes settling)
 // Particles grow until fall velocity balances with diffusion
-void calculate_cloud_properties(double g, double T, double P, double mean_molecular_mass, int condensible_species_id, 
+void calculate_cloud_properties(double T, double P, double mean_molecular_mass, int condensible_species_id, 
     double Kzz, int layer, double *r0, double *r1, double *r2, double *VP, double *effective_settling_velocity,
      double *scale_height, double *mass_per_particle, double *n_density) {
     // Local constants to avoid conflicts with main code
@@ -861,7 +861,8 @@ void calculate_cloud_properties(double g, double T, double P, double mean_molecu
     // ATMOSPHERIC SCALE HEIGHT CALCULATION
     // H = k_B * T / (m_avg * g) where m_avg = mean_molecular_mass * AMU
     // Units: [J/K] * [K] / ([AMU] * [kg/AMU] * [m/s²]) = [m]
-    double H = KB_local * T / mean_molecular_mass / AMU_local / g; // Atmospheric scale height [m]
+    // Use global GA (gravitational acceleration in m/s²)
+    double H = KB_local * T / mean_molecular_mass / AMU_local / GA; // Atmospheric scale height [m]
     
     // DIMENSIONLESS FALL PARAMETER
     // u = K_zz / H represents ratio of diffusion to settling
@@ -960,7 +961,8 @@ void calculate_cloud_properties(double g, double T, double P, double mean_molecu
         // aa = ρ * g / (μ * 162^(1/3) * π^(2/3) * H) * Cc * exp(-ln²(σ))
         // From Stokes law: v_fall = 2*r²*ρ*g*Cc/(9*μ) where r ∝ V^(1/3)
         // This represents the settling velocity term before the max[... - u, 0] operation
-        double aa = rho * g / mu / pow(162.0 * PI_local * PI_local, 1.0 / 3.0) / H * Cc0* exp(-pow(log(sig), 2.0));
+        // Use global GA (gravitational acceleration in m/s²)
+        double aa = rho * GA / mu / pow(162.0 * PI_local * PI_local, 1.0 / 3.0) / H * Cc0* exp(-pow(log(sig), 2.0));
         
         // DIFFUSION TERM: Turbulent mixing coefficient
         // bb = -u/H = -K_zz/H² (opposes settling)
@@ -976,7 +978,8 @@ void calculate_cloud_properties(double g, double T, double P, double mean_molecu
         if (isnan(V) || V <= 0.0) {
             // Updraft-dominated regime: use asymptotic solution
             //V_asym = 39.9 * [μ*u*exp(ln²σ)/(ρ_p*g*C_c)]^(3/2)
-            V = 39.9 * pow(mu * u * exp(pow(log(sig), 2.0)) / (rho * g * Cc0), 3.0 / 2.0);
+            // Use global GA (gravitational acceleration in m/s²)
+            V = 39.9 * pow(mu * u * exp(pow(log(sig), 2.0)) / (rho * GA * Cc0), 3.0 / 2.0);
         }
         
         // PARTICLE DIAMETER from volume
@@ -1043,7 +1046,8 @@ void calculate_cloud_properties(double g, double T, double P, double mean_molecu
     // where v_fall = ρ_p*g*Cc/(162π²)^(1/3)*μ * V^(2/3) * exp(-ln²σ)
     
     // Calculate settling velocity using Hu+2019's formula with our solved volume V
-    double v_fall_hu2019 = (rho * g * Cc0) / (pow(162.0 * PI_local * PI_local, 1.0 / 3.0) * mu) 
+    // Use global GA (gravitational acceleration in m/s²)
+    double v_fall_hu2019 = (rho * GA * Cc0) / (pow(162.0 * PI_local * PI_local, 1.0 / 3.0) * mu) 
                            * pow(Vs, 2.0 / 3.0) * exp(-pow(log(sig), 2.0));
     
     // Apply Hu+2019's correction: v_d = max[v_fall - u, 0]
@@ -1057,7 +1061,8 @@ void calculate_cloud_properties(double g, double T, double P, double mean_molecu
     // Alternative: Calculate using Stokes law with final particle size
     // v_fall = 2*r²*ρ*g*Cc/(9*μ) - Stokes law with Cunningham correction
     // Value comes out the same as Hu+2019, confirming derivation
-    double gravitational_settling = (2.0 * particle_radius_m * particle_radius_m * rho * g * Cc0) / (9.0 * mu);
+    // Use global GA (gravitational acceleration in m/s²)
+    double gravitational_settling = (2.0 * particle_radius_m * particle_radius_m * rho * GA * Cc0) / (9.0 * mu);
 
     // Calculate molecules per particle using the mass_per_particle output parameter
     double molecules_per_particle = (*mass_per_particle) / (molecular_mass_condensible * AMU_local);
@@ -1102,7 +1107,7 @@ void calculate_cloud_properties(double g, double T, double P, double mean_molecu
 
 
 
-void cloud_redistribution_none(double gravity, double P[]) {
+void cloud_redistribution_none(double P[]) {
     
     // Compute particle physics but not redistribution
     for (int layer = 1; layer <= zbin; layer++) {
@@ -1129,7 +1134,7 @@ void cloud_redistribution_none(double gravity, double P[]) {
 
             double Kzz_m2s =  KZZ * 1.0e-4; // Eddy diffusion coefficient [m²/s]
             
-            calculate_cloud_properties(gravity,
+            calculate_cloud_properties(
                 T, P_layer, meanmolecular[layer],
                 species_id, Kzz_m2s, layer,
                 &r0, &r1, &r2, &VP,
@@ -1971,7 +1976,7 @@ double ms_latent(int mol, double temp)
  * - Removed condensate is returned to vapor phase
  * - No material is lost from the system
  */
-void exponential_cloud(double gravity, double P[], double **particle_number_density_out) {
+void exponential_cloud(double P[], double **particle_number_density_out) {
     
     // Use EPACRIS global arrays
     extern double zl[]; // Altitude at layer centers in km
@@ -2043,7 +2048,7 @@ void exponential_cloud(double gravity, double P[], double **particle_number_dens
             double deltaP = 1.0e-12; // Small positive value for numerical stability
             double r0, r1, r2, VP, v_sed_ms, scale_height, mass_per_particle, n_density;
             
-            calculate_cloud_properties(gravity, tl[layer], pl[layer], meanmolecular[layer], 
+            calculate_cloud_properties(tl[layer], pl[layer], meanmolecular[layer], 
                               species_id, Kzz_m2s, layer,
                               &r0, &r1, &r2, &VP, &v_sed_ms, &scale_height, &mass_per_particle, &n_density);
 
@@ -2097,7 +2102,7 @@ void exponential_cloud(double gravity, double P[], double **particle_number_dens
                 double deltaP = 1.0e-12; // Small positive value for numerical stability
                 double r0, r1, r2, VP, v_sed_ms, scale_height, mass_per_particle, n_density;
                 
-                calculate_cloud_properties(gravity, tl[layer], pl[layer], meanmolecular[layer], 
+                calculate_cloud_properties(tl[layer], pl[layer], meanmolecular[layer], 
                                   species_id, Kzz_m2s, layer,
                                   &r0, &r1, &r2, &VP, &v_sed_ms, &scale_height, &mass_per_particle, &n_density);
                 

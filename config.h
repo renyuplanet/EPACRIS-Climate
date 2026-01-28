@@ -34,7 +34,7 @@
 // *** Cloud physics & Condensation ***
 //--------------------------------------------------------------------- 
 // Cloud physics mode
-#define INCLUDE_CLOUD_PHYSICS 1 // 0 = no cloud physics
+#define INCLUDE_CLOUD_PHYSICS 0 // 0 = no cloud physics
                                 // 1 = cloud physics; no redistribution
                                 //  2 = forced cloud redistribution; exponential
 
@@ -48,10 +48,10 @@
                        // 1 = enable cloud albedo summary output during RT calculations
 
 // Cold trap, limits the abundance above condensation region
-#define ENABLE_COLD_TRAP  1  // 0 = disabled, 1 = enabled (affects only condensibles)
+#define ENABLE_COLD_TRAP  0  // 0 = disabled, 1 = enabled (affects only condensibles)
 
 // Freeze cloud, freezes the state of clouds prohibiting it from evolving during the iteration
-#define FREEZE_CLOUD 1
+#define FREEZE_CLOUD 0
 
 // Choose after how many NMAX_RC iteration to freeze the cloud. 
 // 0 freezes the initial condensation state: 1 and n > 1 freezes after the n convective adjustment
@@ -137,7 +137,7 @@
 //--------------------------------------------------------------------- 
 /* Initial Concentration Setting */
 //--------------------------------------------------------------------- 
-#define IMODE       2   /*  0: Calculate initial concentrations from chemical equilibrium sub-routines (not rad);
+#define IMODE       0   /*  0: Calculate initial concentrations from chemical equilibrium sub-routines (not rad);
                         1: Import from SPECIES_LIST;
                         2: Import from results of previous calculations in the standard form
                         3: Calculate initial concentrations from simplied chemical equilibrium formula (not rad);
@@ -172,9 +172,9 @@
 /* Iteration Conditions */
 //--------------------------------------------------------------------- 
 #define NMAX        2       /* Maximum Climate - Chemistry Iterations - Don't need more than 1 with opacity updating */
-#define NMAX_RC     5      /* Maximum Radiative - Convective Iterations, minimum 1 */
-#define NMAX_RT     400     /* Maximum Radiative Transfer Iterations */
-#define NRT_RC      200      /*RT steps between Convective adjustments after initial RT equilibrium (Helios uses 1 step) */
+#define NMAX_RC     10      /* Maximum Radiative - Convective Iterations, minimum 1 */
+#define NMAX_RT     800     /* Maximum Radiative Transfer Iterations */
+#define NRT_RC      50      /*RT steps between Convective adjustments after initial RT equilibrium (Helios uses 1 step) */
 //--------------------------------------------------------------------- 
 
 //--------------------------------------------------------------------- 

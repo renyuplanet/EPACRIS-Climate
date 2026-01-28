@@ -549,9 +549,9 @@ condensation_and_lapse_rate()
 calculate_cloud_properties()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Line ~847: Calculate cloud particle sizes and settling velocities using Hu et al. (2019) microphysics**
+**Line ~845: Calculate cloud particle sizes and settling velocities using Hu et al. (2019) microphysics**
 
-**Inputs:** Gravitational acceleration, temperature, pressure, mean molecular mass, species ID, eddy diffusion coefficient, layer index
+**Inputs:** Temperature, pressure, mean molecular mass, species ID, eddy diffusion coefficient, layer index
 
 **Outputs:** Particle radii ``r0``, ``r1``, ``r2``, volume, settling velocity, scale height, mass, number density
 

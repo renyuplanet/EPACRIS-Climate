@@ -2,15 +2,22 @@
 #ifndef _PLANET_H_ // Prevent multiple inclusion
 #define _PLANET_H_
 
-//---------------------------------------------------------------------
-// Output name and dir. Config file is coppied to output directory 
+//--------------------------------------------------------------------- 
+// *** Output name and directory ***
+//--------------------------------------------------------------------- 
 #define IN_FILE_NAME    "K2-18b"
 #define OUT_DIR         "Results/K2-18b/"
 //---------------------------------------------------------------------
 
 
+//=====================================================================
 //--------------------------------------------------------------------- 
 // *** New or changed config paramaters from MZ ***
+//--------------------------------------------------------------------- 
+//=====================================================================
+
+//--------------------------------------------------------------------- 
+// *** Opacities ***
 //--------------------------------------------------------------------- 
 // Opacity species list - used to read opacity files
 #define OPACITY_SPECIES_LIST \
@@ -23,21 +30,32 @@
 // Opacity file directory
 #define CROSSHEADING		"../Opacity/main_opacities/"
 
+//--------------------------------------------------------------------- 
+// *** Cloud physics & Condensation ***
+//--------------------------------------------------------------------- 
 // Cloud physics mode
-#define INCLUDE_CLOUD_PHYSICS 1 // 0 = no cloud physics
+#define INCLUDE_CLOUD_PHYSICS 0 // 0 = no cloud physics
                                 // 1 = cloud physics; no redistribution
                                 //  2 = forced cloud redistribution; exponential
 
 // Supersaturation parameter for particle sizing
 #define DELTA_P 1.0e-12 // Needs separate mode where it is determined automatically
 
-// Cold trap, limits the abundance above condensation region
-#define ENABLE_COLD_TRAP  1  // 0 = disabled, 1 = enabled (affects only condensibles)
-
-
 // Print cloud debugging output in terminal
-#define CLOUD_DEBUG 0  // 0 = disable cloud optics debugging output
+#define CLOUD_DEBUG_MIE 0  // 0 = disable cloud optics debugging output
                        // 1 = enable detailed cloud optics interpolation debugging
+#define CLOUD_DEBUG_RT 1  // 0 = disable cloud albedo diagnostics in radiative transfer
+                       // 1 = enable cloud albedo summary output during RT calculations
+
+// Cold trap, limits the abundance above condensation region
+#define ENABLE_COLD_TRAP  0  // 0 = disabled, 1 = enabled (affects only condensibles)
+
+// Freeze cloud, freezes the state of clouds prohibiting it from evolving during the iteration
+#define FREEZE_CLOUD 0
+
+// Choose after how many NMAX_RC iteration to freeze the cloud. 
+// 0 freezes the initial condensation state: 1 and n > 1 freezes after the n convective adjustment
+#define FREEZE_CLOUD_AFTER_NMAX_RC 0
 
 // Cloud Mie scattering directory, only need one of these
 #define USE_EPACRIS_FORMAT 1  // 0 = use LX-Mie format, 1 = use EPACRIS format
@@ -46,19 +64,7 @@
 
 // Cloud species for Mie scattering (comma-separated list of species IDs)
 // Example: 7 for H2O, 9 for NH3, 20 for CO, etc.
-#define CLOUD_SPECIES_LIST 7, 9
-
-// Live plotting mode
-#define LIVE_PLOTTING 1  // 0 = disable live plotting,
-                         // 1 = enable live plotting
-
-//Debugging: x steps for live plotting the TP evolution (sets to 1 step for matrix solver)
-#define PRINT_ITER  100  
-
-// Temperature variation tolerance in K used for Climate-Chemistry iterations
-// Was hardcoded before, just added it here now if necessary for later
-#define TVARTOTAL_TOL 1.0 // This is unlikely to be trigerred since only 1 Climate-Chemistry iter is necessary
-
+#define CLOUD_SPECIES_LIST 7
 
 // Condensation params, choose whether to use manual list or dynamic detection
 #define CONDENSATION_MODE 1 // 0 = Manual (use predefined CONDENSIBLES list)
@@ -92,9 +98,55 @@
 #define ENABLE_COLD_TRAP_ALPHA  0  // 0 = disabled (no alpha tracking), 1 = enabled (track original Xtotal and calculate alpha)
 
 //--------------------------------------------------------------------- 
+// *** Live plotting ***
+//--------------------------------------------------------------------- 
+// Live plotting mode
+#define LIVE_PLOTTING 1  // 0 = disable live plotting,
+                         // 1 = enable live plotting
+
+//Debugging: x steps for live plotting the TP evolution (sets to 1 step for matrix solver)
+#define PRINT_ITER  100  
+
+//--------------------------------------------------------------------- 
+// *** Convergence tolerances ***
+//--------------------------------------------------------------------- 
+// Temperature variation tolerance in K used for Climate-Chemistry iterations
+// Was hardcoded before, just added it here now if necessary for later
+#define TVARTOTAL_TOL 1.0 // This is unlikely to be trigerred since only 1 Climate-Chemistry iter is necessary
+
+//=====================================================================
+//--------------------------------------------------------------------- 
 // *** End of new params from MZ ***
 //--------------------------------------------------------------------- 
+//=====================================================================
 
+
+//--------------------------------------------------------------------- 
+/* Planet/Star Physical Properties */
+//--------------------------------------------------------------------- 
+#define MASS_PLANET 5.15401e+25     // kg Planet's mass
+#define RADIUS_PLANET 1.66470e+07   // m Planet's radius
+#define ORBIT      0.1120           // AU  Planet's semi-major axis
+#define KZZ        1.0E+8           // Eddy diffusion coefficient in cm²/s
+#define STAR_SPEC   "Library/Star/gj876.txt"
+#define STAR_RADIUS 0.44            // Solar radius
+#define STAR_TEMP   3457            // Star temperature at surface (old version at 1 AU)
+#define FaintSun    0.3				// Faint early Sun factor = (1-albedo)
+//--------------------------------------------------------------------- 
+
+//--------------------------------------------------------------------- 
+/* Initial Concentration Setting */
+//--------------------------------------------------------------------- 
+#define IMODE       0   /*  0: Calculate initial concentrations from chemical equilibrium sub-routines (not rad);
+                        1: Import from SPECIES_LIST;
+                        2: Import from results of previous calculations in the standard form
+                        3: Calculate initial concentrations from simplied chemical equilibrium formula (not rad);
+                        */
+#define IMODE_CHEM_FILE "Results/K2-18b/ConcentrationSTD_NMAX_1_cp.dat"
+#define ELE_ABUN        "Library/elemental_abundance_files/new_x10Solar.dat"
+#define SPECIES_LIST    "Library/SpeciesList/species_HNCSO.dat" // Molecular species list
+#define REACTION_LIST   "Library/ReactionList/zone_general_CHO.dat" // Reaction List
+//--------------------------------------------------------------------- 
 
 //---------------------------------------------------------------------
 // Choose radiative-convective solver (always 1) anmd time stepping scheme
@@ -117,38 +169,11 @@
 //---------------------------------------------------------------------
 
 //--------------------------------------------------------------------- 
-/* Initial Concentration Setting */
-//--------------------------------------------------------------------- 
-#define IMODE       0   /*  0: Calculate initial concentrations from chemical equilibrium sub-routines (not rad);
-                        1: Import from SPECIES_LIST;
-                        2: Import from results of previous calculations
-                        3: Calculate initial concentrations from simplied chemical equilibrium formula (not rad);
-                        4: Import from results of previous calculations in the standard form (TP import only for rad) // old comment
-                        */
-#define ELE_ABUN        "Library/elemental_abundance_files/new_x10Solar.dat"
-#define SPECIES_LIST "Condition/SpeciesList/species_HNCSO.dat" // Molecular species list
-#define REACTION_LIST "Condition/ReactionList/zone_general_CHO.dat" // Reaction List
-//--------------------------------------------------------------------- 
-
-//--------------------------------------------------------------------- 
-/* Planet/Star Physical Properties */
-//--------------------------------------------------------------------- 
-#define MASS_PLANET 5.15401e+25     // kg Planet's mass
-#define RADIUS_PLANET 1.66470e+07   // m Planet's radius
-#define ORBIT      0.1120           // AU  Planet's semi-major axis
-#define KZZ        1.0E+8           // Eddy diffusion coefficient in cm²/s
-#define STAR_SPEC   "Library/Star/gj876.txt"
-#define STAR_RADIUS 0.44            // Solar radius
-#define STAR_TEMP   3457            // Star temperature at surface (old version at 1 AU)
-#define FaintSun    0.3				// Faint early Sun factor = (1-albedo)
-//--------------------------------------------------------------------- 
-
-//--------------------------------------------------------------------- 
 /* Iteration Conditions */
 //--------------------------------------------------------------------- 
-#define NMAX        1       /* Maximum Climate - Chemistry Iterations - Don't need more than 1 with opacity updating */
+#define NMAX        2       /* Maximum Climate - Chemistry Iterations - Don't need more than 1 with opacity updating */
 #define NMAX_RC     10      /* Maximum Radiative - Convective Iterations, minimum 1 */
-#define NMAX_RT     100     /* Maximum Radiative Transfer Iterations */
+#define NMAX_RT     800     /* Maximum Radiative Transfer Iterations */
 #define NRT_RC      50      /*RT steps between Convective adjustments after initial RT equilibrium (Helios uses 1 step) */
 //--------------------------------------------------------------------- 
 
@@ -170,7 +195,7 @@
 //--------------------------------------------------------------------- 
 #define TPMODE      0            /* 1: import data from a ZTP list;
                                     0: calculate TP profile from the parametized formula*/
-#define TPLIST      "Results/55cnce/standard_200_test_f03/IW-2/NewTemperature.dat"
+#define TPLIST      "Results/K2-18b/frozen_2iters_TP.dat"
 #define zbin        120            /*How many altitude bin?*/
 #define PTOP        1.0E-8       /* Pressure at the top of atmosphere in bar */
 #define TTOP        0       /* Temperature at PTOP in K  Set to 0 for automatic */
