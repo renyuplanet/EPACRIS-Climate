@@ -583,9 +583,14 @@ void condensation_and_lapse_rate(int lay, double lapse[], double xxHe, double* c
     // }
 
 
-}// END: void ms_adiabat()
-//*********************************************************
-//*********************************************************
+}
+// END: condensation_and_lapse_rate()
+
+
+// Not tested code for rainout (pure removal of material from the atmosphere
+// Check before using, but should work
+// NOTE: Enhanced cloud physics is now handled separately
+// This function only handles Graham's basic alpha rainout
 void simulate_rainout(int lay, double* mass_loss_ratio)
 {
 
@@ -758,19 +763,15 @@ void simulate_rainout(int lay, double* mass_loss_ratio)
         *mass_loss_ratio = 1.0;
     }
     
-    // NOTE: Enhanced cloud physics is now handled separately
-    // This function only handles Graham's basic alpha rainout
-    // Enhanced cloud physics and sedimentation are handled in separate functions
+
     
 }
 
-//=========================================================
-//=== Enhanced Cloud Physics Function ====================
-//=========================================================
-
+//--------------------------------------------------------------------- 
+// *** Cloud Physics Functions ***
+//--------------------------------------------------------------------- 
 // SPECIES-SPECIFIC PARTICLE PROPERTIES FUNCTION
 // Returns particle density [kg/m³], accommodation coefficient [dimensionless], and molecular mass [AMU]
-// based on condensible species ID and temperature
 void get_particle_properties(int species_id, double temperature, double *density, double *accommodation_coeff, double *molecular_mass) {
     switch (species_id) {
         case 7: // H₂O (Water)
@@ -836,82 +837,83 @@ void get_particle_properties(int species_id, double temperature, double *density
 }
 
 
-// PARTICLE SIZE CALCULATION USING MICROPHYSICAL BALANCE
+// Particle size calculation using microphysical balance
 // This function calculates equilibrium particle sizes by balancing:
 // 1) Condensational growth (mass diffusion from supersaturated vapor)
 // 2) Gravitational settling (particles fall due to gravity)
 // 3) Eddy diffusion (turbulent mixing opposes settling)
 // Particles grow until fall velocity balances with diffusion
+// From Hu et al. (2019)
 void calculate_cloud_properties(double T, double P, double mean_molecular_mass, int condensible_species_id, 
     double Kzz, int layer, double *r0, double *r1, double *r2, double *VP, double *effective_settling_velocity,
      double *scale_height, double *mass_per_particle, double *n_density) {
+   
     // Local constants to avoid conflicts with main code
     double KB_local = 1.3806503E-23; // Boltzmann constant [J/K]
     double AMU_local = 1.66053886E-27; // Atomic mass unit [kg]
     double RGAS_local = 8.314472; // Universal gas constant [J/(mol·K)]
     double PI_local = 3.1416; // Pi
 
-    // GET SPECIES-SPECIFIC PROPERTIES
+    // Get species-specific properties
     double molecular_mass_condensible; // [AMU]
     double rho, acc; // Particle density [kg/m³] and accommodation coefficient [dimensionless]
-    
+
     // Get all species-specific properties from unified function
     get_particle_properties(condensible_species_id, T, &rho, &acc, &molecular_mass_condensible);
 
-    // ATMOSPHERIC SCALE HEIGHT CALCULATION
+    // Atmospheric scale height calculation
     // H = k_B * T / (m_avg * g) where m_avg = mean_molecular_mass * AMU
     // Units: [J/K] * [K] / ([AMU] * [kg/AMU] * [m/s²]) = [m]
     // Use global GA (gravitational acceleration in m/s²)
+    // This is the same as the scale height calculation in ms_adiabat, so somewhat redundant
     double H = KB_local * T / mean_molecular_mass / AMU_local / GA; // Atmospheric scale height [m]
     
-    // DIMENSIONLESS FALL PARAMETER
+    // Dimensionless fall parameter
     // u = K_zz / H represents ratio of diffusion to settling
     // Higher u = more diffusion relative to settling = smaller particles
     double u = Kzz / H; // Dimensionless eddy diffusion parameter
     
-    // ATMOSPHERIC VISCOSITY (temperature-dependent)
+    // Atmospheric viscosity (temperature-dependent)
     // Sutherland's formula: μ = μ₀ * (T/T₀)^1.5 * (T₀ + S)/(T + S)
-    
-    // ATMOSPHERIC COMPOSITION SELECTION
     // Choose atmospheric type: 0=H2, 1=Air, 2=CO2, 3=N2, 4=Ar, 5=He
     int atmosphere_type = 0;  // DEFAULT: H2 atmosphere (common for gas giants/exoplanets)
-    
+
     // Sutherland constants for different atmospheric compositions
     // Values from Sutherland (1893), COMSOL, and atmospheric physics literature
     double mu0, T0, S_sutherland;
     
     if (atmosphere_type == 0) {
-        // HYDROGEN (H2) - Default for gas giant/exoplanet atmospheres
+        // Hydrogen (H2) - Default for gas giant/exoplanet atmospheres
         mu0 = 8.411E-6;    // Reference viscosity [Pa·s] at 273K
         T0 = 273.15;       // Reference temperature [K]
         S_sutherland = 97.0;  // Sutherland constant [K]
     } else if (atmosphere_type == 1) {
-        // AIR (N2/O2 mix) - Earth-like atmospheres
+        // Air (N2/O2 mix) - Earth-like atmospheres
         mu0 = 1.716E-5;    // Reference viscosity [Pa·s] at 273K
         T0 = 273.15;       // Reference temperature [K] 
         S_sutherland = 110.4;  // Sutherland constant [K]
     } else if (atmosphere_type == 2) {
-        // CARBON DIOXIDE (CO2) - Venus-like or early Mars
+        // Carbon dioxide (CO2) - Venus-like or early Mars
         mu0 = 1.370E-5;    // Reference viscosity [Pa·s] at 273K
         T0 = 273.15;       // Reference temperature [K]
         S_sutherland = 222.0;  // Sutherland constant [K]
     } else if (atmosphere_type == 3) {
-        // NITROGEN (N2) - Titan-like atmospheres
+        // Nitrogen (N2) - Titan-like atmospheres
         mu0 = 1.663E-5;    // Reference viscosity [Pa·s] at 273K
         T0 = 273.15;       // Reference temperature [K]
         S_sutherland = 107.0;  // Sutherland constant [K]
     } else if (atmosphere_type == 4) {
-        // ARGON (Ar) - Some planetary atmospheres
+        // Argon (Ar) - Some planetary atmospheres
         mu0 = 2.125E-5;    // Reference viscosity [Pa·s] at 273K
         T0 = 273.15;       // Reference temperature [K]
         S_sutherland = 114.0;  // Sutherland constant [K]
     } else if (atmosphere_type == 5) {
-        // HELIUM (He) - Helium-rich atmospheres
+        // Helium (He) - Helium-rich atmospheres
         mu0 = 1.865E-5;    // Reference viscosity [Pa·s] at 273K
         T0 = 273.15;       // Reference temperature [K]
         S_sutherland = 79.4;   // Sutherland constant [K]
     } else {
-        // DEFAULT: Fall back to H2 if unknown type
+        // Default: Fall back to H2 if unknown type
         mu0 = 8.411E-6;    // H2 values
         T0 = 273.15;
         S_sutherland = 97.0;
@@ -920,28 +922,29 @@ void calculate_cloud_properties(double T, double P, double mean_molecular_mass, 
     // Calculate atmospheric viscosity using Sutherland's formula
     double mu = mu0 * pow(T / T0, 1.5) * (T0 + S_sutherland) / (T + S_sutherland); // Viscosity [Pa·s]
     
-    // MEAN FREE PATH OF GAS MOLECULES
+    // Mean free path of gas molecules
     // λ = 2μ / (P * √(8*mean_molecular_mass/(πRT))) - kinetic theory result
     // Units: [Pa·s] / ([Pa] * √([kg/mol]/([J/(mol·K)] * [K]))) = [m]
     double lambda = 2 * mu / P / pow(8 * mean_molecular_mass * 1.0E-3 / PI_local / RGAS_local / T, 0.5); // Mean free path [m]
     
-    // NUMBER DENSITY OF CONDENSING MOLECULES
+    // Excess number density of condensing molecules
+    // DELTA_P is defined in the config.h file but should be calculated self-consistently
     // From ideal gas law: n = ΔP / (k_B * T)
     // where ΔP = P_partial - P_saturation (supersaturation pressure)
-    // This needs to be updated to use precondensed values from ms_adiabat
+    // This may need to be updated to use precondensed values from ms_adiabat
     // Units: [Pa] / ([J/K] * [K]) = [molecules/m³]
     double deltan = DELTA_P / KB_local / T; // Excess number density [molecules/m³]
 
-    // MASS DIFFUSION COEFFICIENT
+    // Mass diffusion coefficient
     // Approximation for molecular diffusion in gas
     double D = 0.12e-4; // Mass diffusion coefficient [m²/s]
 
-    // PARTICLE SIZE DISTRIBUTION PARAMETERS
+    // Particle size distribution parameters
     double Cc0= 1.0; // Initial Cunningham slip correction factor [dimensionless]
     double fa = 1.0; // Initial ventilation factor [dimensionless]  
     double sig = 2.0; // Log-normal size distribution width parameter [dimensionless]
 
-    // ITERATIVE SOLUTION FOR EQUILIBRIUM PARTICLE SIZE
+    // Iterative solution for equilibrium particle size
     // Solve for particle volume V by balancing:
     // 1) Condensational growth: ∝ D * deltan / ρ
     // 2) Effective gravitational settling: ∝ max[settling_term - u, 0]  
@@ -951,24 +954,24 @@ void calculate_cloud_properties(double T, double P, double mean_molecular_mass, 
     
     for (int dump = 1; dump <= 1e3; ++dump) {
 
-        // CONDENSATION TERM: Rate of volume growth from vapor deposition
+        // Condensation term: Rate of volume growth from vapor deposition
         // cc = -48^(1/3) * π^(2/3) * D * molecular_mass_condensible * fa * Δn / ρ * exp(-ln²(σ))
         // Negative because we're solving the quadratic equation
         // This term should be negligible if deltan is low
         double cc = -(pow(48.0 * PI_local * PI_local, 1.0 / 3.0) * D * molecular_mass_condensible * AMU_local * fa * deltan / rho * exp(-pow(log(sig), 2.0)));
         
-        // SETTLING TERM: Gravitational fall velocity coefficient  
+        // Settling term: Gravitational fall velocity coefficient  
         // aa = ρ * g / (μ * 162^(1/3) * π^(2/3) * H) * Cc * exp(-ln²(σ))
         // From Stokes law: v_fall = 2*r²*ρ*g*Cc/(9*μ) where r ∝ V^(1/3)
         // This represents the settling velocity term before the max[... - u, 0] operation
         // Use global GA (gravitational acceleration in m/s²)
         double aa = rho * GA / mu / pow(162.0 * PI_local * PI_local, 1.0 / 3.0) / H * Cc0* exp(-pow(log(sig), 2.0));
         
-        // DIFFUSION TERM: Turbulent mixing coefficient
+        // Diffusion term: Turbulent mixing coefficient
         // bb = -u/H = -K_zz/H² (opposes settling)
         double bb = -u / H;
 
-        // SOLVE QUADRATIC EQUATION: aa*V^(2/3) + bb*V^(1/3) + cc = 0
+        // Solve quadratic equation: aa*V^(2/3) + bb*V^(1/3) + cc = 0
         // Using quadratic formula after substituting V^(1/3) = x
         // This gives equilibrium volume where growth = settling + diffusion
         // V = [(-bb + sqrt(bb * bb - 4.0 * aa * cc)) / 2.0 / aa]^(3/2)
@@ -982,23 +985,23 @@ void calculate_cloud_properties(double T, double P, double mean_molecular_mass, 
             V = 39.9 * pow(mu * u * exp(pow(log(sig), 2.0)) / (rho * GA * Cc0), 3.0 / 2.0);
         }
         
-        // PARTICLE DIAMETER from volume
+        // Particle diameter from volume
         // d = (6V/π)^(1/3) * exp(-ln²(σ)) [m]
         double d1 = pow(6.0 * V / PI_local, 1.0 / 3.0) * exp(-pow(log(sig), 2.0));
 
-        // UPDATE SLIP CORRECTION FACTORS
+        // Update slip correction factors
         // Knudsen number: Kn = λ/d (ratio of mean free path to particle size)
         double kn = lambda / d1;
         
-        // CUNNINGHAM SLIP CORRECTION: Cc = 1 + Kn*(1.257 + 0.4*exp(-1.1/Kn))
+        // Cunningham slip correction: Cc = 1 + Kn*(1.257 + 0.4*exp(-1.1/Kn))
         // Accounts for non-continuum effects when particles approach molecular size
         double Cc1 = 1.0 + kn * (1.257 + 0.4 * exp(-1.1 / kn));
         
-        // VENTILATION CORRECTION: Accounts for enhanced mass transfer during settling
+        // Ventilation correction: Accounts for enhanced mass transfer during settling
         // fa = (1 + Kn)/(1 + 2*Kn*(1+Kn)/α) where α is accommodation coefficient
         double fa1 = (1.0 + kn) / (1.0 + 2.0 * kn * (1.0 + kn) / acc);
         
-        // CHECK CONVERGENCE: Continue iteration until slip factors stabilize
+        // Check convergence: Continue iteration until slip factors stabilize
         if (fabs(Cc1 - Cc0) + fabs(fa1 - fa) < 0.001) {
             Vs = V; // Final volume [m³]
             break;
@@ -1008,74 +1011,79 @@ void calculate_cloud_properties(double T, double P, double mean_molecular_mass, 
         }
     }
     
-    // CALCULATE CHARACTERISTIC PARTICLE RADII from log-normal distribution
+    // Calculate characteristic particle radii from log-normal distribution
     // For log-normal distribution with geometric standard deviation σ:
     // r_i = r_mean * exp(n * ln²(σ)) where n depends on moment
     
-    //r0, r1, r2, VP are in microns
-    // r₀: Mean radius weighted by number (smallest particles) [μm]
+    // r0, r1, r2, VP are in microns
+    // r0: Mean radius weighted by number (smallest particles) [μm]
+    // NOTE: When cloud redistribution is disabled, r0 is stored but NOT USED anywhere
     *r0 = pow((3.0 * Vs) / (4.0 * PI_local), 1.0 / 3.0) * exp(-1.5 * pow(log(sig), 2.0)) * 1.0E+6;
     
     // r₁: Mean radius weighted by surface area [μm] 
+    // NOTE: When cloud redistribution is disabled, r1 is stored but NOT USED anywhere
     *r1 = pow((3.0 * Vs) / (4.0 * PI_local), 1.0 / 3.0) * exp(-pow(log(sig), 2.0)) * 1.0E+6;
     
     // r₂: Mean radius weighted by volume (largest/most massive particles) [μm]
     // This is used for sedimentation calculations since fall velocity ∝ r²
+    // USED: Stored in particle_r2[][] and used in cloud_optics.c::calculate_cloud_opacity_arrays() line ~850
     *r2 = pow((3.0 * Vs) / (4.0 * PI_local), 1.0 / 3.0) * exp(-0.5 * pow(log(sig), 2.0)) * 1.0E+6;
     
     // VP: Final particle volume in cm³ (convert from m³: 1 m³ = 1e6 cm³)
+    // NOTE: When cloud redistribution is disabled, VP is stored but NOT USED anywhere
     *VP = Vs * 1.0E+6;
 
     // Calculate mass per particle [kg] (Vs in m³, rho in kg/m³)
+    // NOTE: When cloud redistribution is disabled, mass_per_particle is stored but NOT USED.
+    //       However, it IS needed internally below to calculate molecules_per_particle for n_density.
     *mass_per_particle = Vs * rho;
 
-    // This is the cloud density but not used now
-    // 1. Get cloud mass density from Hu+2019 Equation 2:
-    //double cloud_mass_density = (xx_original - xx_saturated) * MM * molecular_mass / RGAS / T;
-
-    // Convert to C
-    //double cloud_density = cloud_mass_density / molecular_mass;
-
-    // Calculate the particle number density
-    //double particle_number_density = calculate_particle_number_density_from_molecules(molecular_number_density, particle_radius_m, condensate_density, molecular_mass_kg);
-    //*particle_number_density = particle_number_density;
-
-
-    // HU+2019 APPROACH: Use their Equation A3 for settling velocity
+    // Hu+2019 approach Equation A3 for settling velocity
     // From Hu+2019 Appendix, Equation A3: v_d = max[v_fall - u, 0]
     // where v_fall = ρ_p*g*Cc/(162π²)^(1/3)*μ * V^(2/3) * exp(-ln²σ)
     
     // Calculate settling velocity using Hu+2019's formula with our solved volume V
     // Use global GA (gravitational acceleration in m/s²)
+    // NOTE: When cloud redistribution is disabled, v_fall_hu2019 is NOT USED
     double v_fall_hu2019 = (rho * GA * Cc0) / (pow(162.0 * PI_local * PI_local, 1.0 / 3.0) * mu) 
                            * pow(Vs, 2.0 / 3.0) * exp(-pow(log(sig), 2.0));
     
     // Apply Hu+2019's correction: v_d = max[v_fall - u, 0]
     // If using fall - u from Hu, this results in 0.
-
+    // NOTE: When cloud redistribution is disabled, v_d is NOT USED
     double v_d = fmax(0.0, v_fall_hu2019 - u);
     
     // Use r2 (volume-weighted radius) for sedimentation calculations
+    // NOTE: particle_radius_m is only used internally below to calculate gravitational_settling
     double particle_radius_m = *r2 * 1.0e-6; // Convert μm to m
 
     // Alternative: Calculate using Stokes law with final particle size
     // v_fall = 2*r²*ρ*g*Cc/(9*μ) - Stokes law with Cunningham correction
     // Value comes out the same as Hu+2019, confirming derivation
     // Use global GA (gravitational acceleration in m/s²)
+    // NOTE: When cloud redistribution is disabled, gravitational_settling is NOT USED
     double gravitational_settling = (2.0 * particle_radius_m * particle_radius_m * rho * GA * Cc0) / (9.0 * mu);
 
     // Calculate molecules per particle using the mass_per_particle output parameter
+    // NOTE: molecules_per_particle is only used internally below to calculate n_density
     double molecules_per_particle = (*mass_per_particle) / (molecular_mass_condensible * AMU_local);
+
     // Calculate particle number density [particles/m³]
     // clouds[layer][condensible_species_id] is in molecules/cm³
     // n_particles = n_molecules / molecules_per_particle gives particles/cm³
     // Convert to particles/m³ by multiplying by 1e6 (1 m³ = 1e6 cm³)
+    // USED: Stored in particle_number_density[][] and used in cloud_optics.c::calculate_cloud_opacity_arrays()
     *n_density = (clouds[layer][condensible_species_id] / molecules_per_particle) * 1.0e6;
+    
     // Return the actual fall velocity and scale height
+    // NOTE: When cloud redistribution is disabled, effective_settling_velocity is NOT USED (not stored, not used)
     *effective_settling_velocity = gravitational_settling; // [m/s] - actual fall velocity
+    // NOTE: When cloud redistribution is disabled, scale_height is NOT USED (not stored, not used).
+    //       When cloud redistribution IS enabled (exponential_cloud), scale_height IS USED at line ~2052.
     *scale_height = H; // [m]
+
+
     // Debug output to verify the theory
-    // Useful debug output
     // if (layer >= 55 && layer <= 65) {
     //     printf("PARTICLE NUMBER DENSITY DEBUG (Layer %d):\n", layer);
     //     printf("  Molecular number density: %.2e molecules/cm³\n", clouds[layer][condensible_species_id]);
@@ -1091,7 +1099,6 @@ void calculate_cloud_properties(double T, double P, double mean_molecular_mass, 
     //     printf("  Expected reduction factor: %.2e\n", clouds[layer][condensible_species_id] / particle_number_density);
     //     printf("  ---\n");
     // }
-
     // printf ("==============================================\n");
     // printf ("VALUES FROM PARTICLESIZEF_LOCAL\n");
     // printf ("viscosity: %.2e\n", mu);
@@ -1106,9 +1113,9 @@ void calculate_cloud_properties(double T, double P, double mean_molecular_mass, 
 }
 
 
-
-void cloud_redistribution_none(double P[]) {
-    
+// Function that stores particle properties and calls cloud physics
+// Does not reshape the cloud
+void store_cloud_properties(double P[]) {
     // Compute particle physics but not redistribution
     for (int layer = 1; layer <= zbin; layer++) {
         for (int i = 0; i < NCONDENSIBLES; i++) {
@@ -1145,8 +1152,8 @@ void cloud_redistribution_none(double P[]) {
             
             // Store multiple particle properties for potential use elsewhere
             // All values calculated once in particlesizef_local and stored for reuse
-            particle_r2[layer][i] = r2;              // r2: volume-weighted radius [μm]
-            particle_r1[layer][i] = r1;             // r1: surface-area-weighted radius [μm] (for cloud optics)
+            particle_r2[layer][i] = r2;              // r2: volume-weighted radius [μm] (for cloud optics)
+            particle_r1[layer][i] = r1;             // r1: surface-area-weighted radius [μm]
             particle_r0[layer][i] = r0;             // r0: nucleation/monomer radius [μm]
             particle_VP[layer][i] = VP;             // VP: particle volume [cm³]
             particle_mass[layer][i] = mass_per_particle; // mass per particle [kg]
@@ -1951,6 +1958,85 @@ double ms_latent(int mol, double temp)
     return l;
 }// END: couble ms_latent()
 
+
+
+
+//--------------------------------------------------------------------- 
+// Cloud freezing functions
+//--------------------------------------------------------------------- 
+
+/**
+ * Freeze the current cloud state - store clouds array to frozen_clouds
+ * This prevents clouds from evolving during subsequent iterations
+ */
+void freeze_cloud_state() {
+    if (!FREEZE_CLOUD) {
+        return; // Freezing disabled
+    }
+    
+    // Copy current cloud state AND gas phase to frozen storage
+    // We need to freeze both to maintain consistency
+    for (int j = 1; j <= zbin; j++) {
+        for (int i = 1; i <= NSP; i++) {
+            frozen_clouds[j][i] = clouds[j][i];
+            frozen_xx[j][i] = xx[j][i];  // Also freeze gas phase for condensible species
+        }
+    }
+    
+    clouds_frozen = 1;
+    printf("CLOUD STATE FROZEN: Condensation will not recalculate after this point\n");
+}
+
+/**
+ * Restore frozen cloud state AND gas phase to clouds and xx arrays
+ * Called at the start of condensation calculation when clouds are frozen
+ * This ensures both condensed and gas phases remain consistent
+ * Only restores condensible species to avoid overwriting non-condensible species
+ */
+void restore_frozen_clouds() {
+    if (!clouds_frozen) {
+        return; // Nothing to restore
+    }
+    
+    // Restore frozen cloud state AND gas phase ONLY for condensible species
+    // This prevents gas phase from changing when clouds are frozen
+    // Non-condensible species are NOT restored, allowing them to evolve normally
+    for (int j = 1; j <= zbin; j++) {
+        for (int i = 0; i < NCONDENSIBLES; i++) {
+            int species_id = CONDENSIBLES[i];
+            clouds[j][species_id] = frozen_clouds[j][species_id];
+            xx[j][species_id] = frozen_xx[j][species_id];  // Restore gas phase for condensibles only
+        }
+    }
+}
+
+/**
+ * Check if clouds are currently frozen
+ * Returns 1 if frozen, 0 if not
+ */
+int are_clouds_frozen() {
+    return clouds_frozen;
+}
+
+/**
+ * Reset frozen cloud state - clears frozen flag and frozen storage
+ * Should be called at the start of each NMAX iteration to reset state
+ */
+void reset_frozen_cloud_state() {
+    clouds_frozen = 0;
+    
+    // Clear frozen cloud and gas phase storage
+    for (int j = 1; j <= zbin; j++) {
+        for (int i = 1; i <= NSP; i++) {
+            frozen_clouds[j][i] = 0.0;
+            frozen_xx[j][i] = 0.0;
+        }
+    }
+}
+
+// *** Cloud Redistribution Functions ***
+// Not fully implemented!! needs to be linked to cloud_optics.c 
+// Use no redistribution for now
 /**
  * HYBRID A&M + HU+2019 + MS_ADIABAT CLOUD DISTRIBUTION
  * 
@@ -1976,7 +2062,7 @@ double ms_latent(int mol, double temp)
  * - Removed condensate is returned to vapor phase
  * - No material is lost from the system
  */
-void exponential_cloud(double P[], double **particle_number_density_out) {
+ void exponential_cloud(double P[], double **particle_number_density_out) {
     
     // Use EPACRIS global arrays
     extern double zl[]; // Altitude at layer centers in km
@@ -2164,79 +2250,6 @@ void exponential_cloud(double P[], double **particle_number_density_out) {
     }
     
     printf("--- HYBRID A&M + HU+2019 + MS_ADIABAT CLOUD DISTRIBUTION COMPLETE ---\n");
-}
-
-//--------------------------------------------------------------------- 
-// Cloud freezing functions
-//--------------------------------------------------------------------- 
-
-/**
- * Freeze the current cloud state - store clouds array to frozen_clouds
- * This prevents clouds from evolving during subsequent iterations
- */
-void freeze_cloud_state() {
-    if (!FREEZE_CLOUD) {
-        return; // Freezing disabled
-    }
-    
-    // Copy current cloud state AND gas phase to frozen storage
-    // We need to freeze both to maintain consistency
-    for (int j = 1; j <= zbin; j++) {
-        for (int i = 1; i <= NSP; i++) {
-            frozen_clouds[j][i] = clouds[j][i];
-            frozen_xx[j][i] = xx[j][i];  // Also freeze gas phase for condensible species
-        }
-    }
-    
-    clouds_frozen = 1;
-    printf("CLOUD STATE FROZEN: Condensation will not recalculate after this point\n");
-}
-
-/**
- * Restore frozen cloud state AND gas phase to clouds and xx arrays
- * Called at the start of condensation calculation when clouds are frozen
- * This ensures both condensed and gas phases remain consistent
- * Only restores condensible species to avoid overwriting non-condensible species
- */
-void restore_frozen_clouds() {
-    if (!clouds_frozen) {
-        return; // Nothing to restore
-    }
-    
-    // Restore frozen cloud state AND gas phase ONLY for condensible species
-    // This prevents gas phase from changing when clouds are frozen
-    // Non-condensible species are NOT restored, allowing them to evolve normally
-    for (int j = 1; j <= zbin; j++) {
-        for (int i = 0; i < NCONDENSIBLES; i++) {
-            int species_id = CONDENSIBLES[i];
-            clouds[j][species_id] = frozen_clouds[j][species_id];
-            xx[j][species_id] = frozen_xx[j][species_id];  // Restore gas phase for condensibles only
-        }
-    }
-}
-
-/**
- * Check if clouds are currently frozen
- * Returns 1 if frozen, 0 if not
- */
-int are_clouds_frozen() {
-    return clouds_frozen;
-}
-
-/**
- * Reset frozen cloud state - clears frozen flag and frozen storage
- * Should be called at the start of each NMAX iteration to reset state
- */
-void reset_frozen_cloud_state() {
-    clouds_frozen = 0;
-    
-    // Clear frozen cloud and gas phase storage
-    for (int j = 1; j <= zbin; j++) {
-        for (int i = 1; i <= NSP; i++) {
-            frozen_clouds[j][i] = 0.0;
-            frozen_xx[j][i] = 0.0;
-        }
-    }
 }
 
 

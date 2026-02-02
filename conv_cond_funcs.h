@@ -21,7 +21,7 @@ void ms_temp_adj(double tempb[],double P[],double lapse[],int isconv[], double c
 void get_particle_properties(int species_id, double temperature, double *density, double *accommodation_coeff, double *molecular_mass);
 void calculate_cloud_properties(double T, double P, double mean_molecular_mass, int condensible_species_id, double Kzz, int layer, double *r0, double *r1, double *r2, double *VP, double *effective_settling_velocity, double *scale_height, double *mass_per_particle, double *n_density);
 void exponential_cloud(double P[], double **particle_r2);
-void cloud_redistribution_none(double P[]);
+void store_cloud_properties(double P[]);
 
 // Global alpha storage functions
 void init_alpha_values();

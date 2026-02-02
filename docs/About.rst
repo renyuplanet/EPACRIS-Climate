@@ -7,7 +7,7 @@ EPACRIS-Climate Cloud v0.1 Documentation
 ========================================
 
 
-EPACRIS (ExoPlanet Atmospheric Chemistry & Radiative Interaction Simulator) is a one-dimensional atmospheric structure model that solves for the temperature-pressure profile and chemical composition of planetary atmospheres in radiative-convective equilibrium. The model iteratively couples radiative transfer, convective adjustment, equilibrium chemistry, and cloud microphysics to determine the steady-state atmospheric structure and composition, based on fundamental principles and user-specified initial and boundary conditions.
+EPACRIS (ExoPlanet Atmospheric Chemistry & Radiative Interaction Simulator) is a one-dimensional atmospheric structure model that solves for the temperature-pressure profile and chemical composition of planetary atmospheres in radiative-convective equilibrium. The model iteratively couples radiative transfer, convective adjustment, equilibrium chemistry, and cloud microphysics to determine the steady-state atmospheric structure and composition, based on fundamental principles and user-specified initial and boundary conditions. For setup instructions, see the :doc:`Getting_started` section. For configuration details, see the :doc:`Configuration_file` section. For code structure and implementation details, see the :doc:`Code_structure` section.
 
 The code can be found at `GitHub repository (dev_clouds branch) <https://github.com/renyuplanet/EPACRIS-Climate/tree/dev_clouds>`_.
 
@@ -16,7 +16,7 @@ Current version overview
 
 EPACRIS-Climate Cloud v0.1 includes newly added multi-species condensation and cloud microphysics, which is incorporated in the radiatiative-transfer routines. The code accounts for wavelength-dependant opacities of gases (line-by-line), including collision-induced, as well as absorption and scattering of condensed cloud particles. Current version supports arbitrary equilibrium chemistry compositions and can simulate both dilute and non-dilute atmospheres, including cases where condensates significantly affect the atmospheric structure and energy balance.
 
-The cloud physics module implements multi-species condensation and cloud microphysics. The moist adiabatic lapse rate follows the formulation of Graham et al. (2021). The model tracks multiple condensible species simultaneously, computing their saturation vapor pressures and partitioning between vapor and condensed phases at each atmospheric layer. Cloud particle sizes are calculated using a log-normal size distribution, with particle properties determined from the balance between condensation growth, gravitational settling, and turbulent mixing. Cloud optical properties are computed via Mie scattering theory using pre-computed lookup tables, ensuring consistency between the particle size distribution used for optical property calculations and the physical properties computed from the cloud microphysics.
+The cloud physics module implements multi-species condensation and cloud microphysics. The moist adiabatic lapse rate follows the formulation of Graham et al. (2021). The model tracks multiple condensible species simultaneously, computing their saturation vapor pressures and partitioning between vapor and condensed phases at each atmospheric layer (see :ref:`Code_structure:condensation_lapse_rate`). Cloud particle sizes are calculated using a log-normal size distribution, with particle properties determined from the balance between condensation growth, gravitational settling, and turbulent mixing (see :ref:`Code_structure:calculate_cloud_properties`). Cloud optical properties are computed via Mie scattering theory using pre-computed lookup tables (see :ref:`Code_structure:cloud_optics`), ensuring consistency between the particle size distribution used for optical property calculations and the physical properties computed from the cloud microphysics. For configuration of cloud physics parameters, see the :doc:`Configuration_file` section.
 
 Authors
 -------
@@ -30,7 +30,9 @@ Quick user guide
 
 * To compile: ``gcc epacris_main.c -lm -o epacris``
 * To run: ``./epacris``
-* Config file is ``config.h`` in the root folder.
+* Config file is ``config.h`` in the root folder (see :doc:`Configuration_file` for all parameters).
+
+For detailed setup instructions, see the :doc:`Getting_started` section. For complete configuration reference, see the :doc:`Configuration_file` section. For understanding the code structure and implementation, see the :doc:`Code_structure` section.
 
 Acknowledgement
 ---------------

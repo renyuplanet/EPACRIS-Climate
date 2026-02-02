@@ -20,7 +20,7 @@ Setting up a simple case
 The parameters here are for a high albedo K2-18 b case using a H-N-C-O-S network and increased 10x solar metallicity. 
 
 
-All configuration is done through the ``config.h`` file in the root directory. The config setup is copied to the output location for each run. The following steps explain key parameters for a simple setup. For a complete parameter reference, see the :doc:`Configuration_file` section.
+All configuration is done through the ``config.h`` file in the root directory. The config setup is copied to the output location for each run. The following steps explain key parameters for a simple setup. For a complete parameter reference, see the :doc:`Configuration_file` section. For details on how these parameters are used in the code, see the :doc:`Code_structure` section.
 
 **Step 1: Set output directory and run name**
 
@@ -52,11 +52,11 @@ Set the directory where opacity files are located, these can be downloaded `here
 
    #define CROSSHEADING "../Opacity/main_opacities/"
 
-If adding your own line-by-line opacities, ensure opacity files exist for each species in the format ``opac<SPECIES>.dat`` (e.g., ``opacH2O.dat``, ``opacNH3.dat``). The format of opacities is explained in the :doc:`Code_structure` section.
+If adding your own line-by-line opacities, ensure opacity files exist for each species in the format ``opac<SPECIES>.dat`` (e.g., ``opacH2O.dat``, ``opacNH3.dat``). The format of opacities is explained in the :doc:`Code_structure` section (see :ref:`Code_structure:opacity_loading`).
 
 **Step 3: Configure cloud physics**
 
-If you want to include cloud microphysics and Mie scattering, enable the ``INCLUDE_CLOUD_PHYSICS`` flag and set the ``USE_EPACRIS_FORMAT`` to ``1`` for the default EPACRIS Mie table format or ``0`` for the LX-Mie format. ``INCLUDE_CLOUD_PHYSICS 1`` is recommended for a self-consistent model. Included molecule IDs in ``CLOUD_SPECIES_LIST`` will tell the code which condensed species to process for cloud microphysics, while ``KZZ`` will impact cloud particle sizes. Note, chemical species in EPACRIS are referenced with integer IDs, which are determined in the species file such as ``Library/SpeciesList/species_HNCSO.dat`` in the ``Standard Number`` column.
+If you want to include cloud microphysics and Mie scattering, enable the ``INCLUDE_CLOUD_PHYSICS`` flag and set the ``USE_EPACRIS_FORMAT`` to ``1`` for the default EPACRIS Mie table format or ``0`` for the LX-Mie format. ``INCLUDE_CLOUD_PHYSICS 1`` is recommended for a self-consistent model. Included molecule IDs in ``CLOUD_SPECIES_LIST`` will tell the code which condensed species to process for cloud microphysics, while ``KZZ`` will impact cloud particle sizes. Note, chemical species in EPACRIS are referenced with integer IDs, which are determined in the species file such as ``Library/SpeciesList/species_HNCSO.dat`` in the ``Standard Number`` column. For details on cloud physics implementation, see the :doc:`Code_structure` section (specifically :ref:`Code_structure:store_cloud_properties` and :ref:`Code_structure:cloud_optics`).
 
 .. code-block:: c
 
@@ -94,7 +94,7 @@ The stellar spectrum file should contain two columns: wavelength (nm) and flux (
 
 **Step 5: Set the chemistry mode and relevant paths**
 
-Set the chemistry mode to ``IMODE 0`` for chemical equilibrium. Otherwise, a different value can be chosen, such as ``IMODE 1``, to import a predetermined molecular composition from the species list file (see the :doc:`Configuration_file` section for a full explanation of this parameter). The relevant paths for the elemental budget and molecular species list can also be set here.
+Set the chemistry mode to ``IMODE 0`` for chemical equilibrium. Otherwise, a different value can be chosen, such as ``IMODE 1``, to import a predetermined molecular composition from the species list file (see the :doc:`Configuration_file` section for a full explanation of this parameter). The relevant paths for the elemental budget and molecular species list can also be set here. For details on how chemistry is initialized, see the :doc:`Code_structure` section (specifically :ref:`Code_structure:initial_composition`).
 
 .. code-block:: c
 
@@ -142,14 +142,15 @@ The model will:
 * Print initialization information to the terminal
 * Create the output directory if it doesn't exist
 * Copy ``config.h`` to the output directory as ``config_<IN_FILE_NAME>.txt``
-* Write output files to the output directory
+* Write output files to the output directory (see :ref:`Code_structure:output_preparation` for file descriptions)
+* Run the climate solver (see :ref:`Code_structure:climate_solver` for details)
 * (If enabled) Generate live debugging plots in ``<OUT_DIR>/live_plot/``
 
 
 Reading output files
 --------------------
 
-The model generates several output files in the ``OUT_DIR`` directory:
+The model generates several output files in the ``OUT_DIR`` directory (see :ref:`Code_structure:output_preparation` for details on output file setup):
 
 Main output files
 ~~~~~~~~~~~~~~~~~

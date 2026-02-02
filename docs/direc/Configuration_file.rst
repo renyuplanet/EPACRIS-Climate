@@ -28,21 +28,21 @@ Cloud physics & condensation configuration
 
 * **CLOUD_DEBUG_RT**: Enable cloud albedo diagnostics in the radiative transfer module. Set to ``0`` to disable or ``1`` to print summaries of cloud albedo effects, single-scattering albedo changes, and cloud opacity contributions. Output is printed for every cloud layer only every ``NRT_RC`` steps to avoid terminal spam.
 
-* **ENABLE_COLD_TRAP**: Enable cold trap mechanism that limits vapor abundance above condensation regions. Set to ``0`` to disable or ``1`` to enable. When enabled, condensible species are depleted above their condensation level, simulating efficient removal by settling or rainout. Only affects condensible species.
+* **ENABLE_COLD_TRAP**: Enable cold trap mechanism that limits vapor abundance above condensation regions. Set to ``0`` to disable or ``1`` to enable. When enabled, condensible species are depleted above their condensation level, simulating efficient removal by settling or rainout. Only affects condensible species. See the :doc:`Code_structure` section (specifically :ref:`Code_structure:condensation_lapse_rate`) for details on cold trap implementation.
 
-* **FREEZE_CLOUD**: Enable to freeze the state of condensed material prohibiting the cloud from evolving during the iteration. Set to ``0`` to disable or ``1`` to enable. When enabled, ``FREEZE_CLOUD_AFTER_NMAX_RC`` value needs to be chosen.
+* **FREEZE_CLOUD**: Enable to freeze the state of condensed material prohibiting the cloud from evolving during the iteration. Set to ``0`` to disable or ``1`` to enable. When enabled, ``FREEZE_CLOUD_AFTER_NMAX_RC`` value needs to be chosen. See the :doc:`Code_structure` section (specifically :ref:`Code_structure:climate_solver`) for details on cloud freezing implementation.
 
 * **FREEZE_CLOUD_AFTER_NMAX_RC**: Determines when the condensed material is frozen. ``0`` freezes the state after the initial condensation calculation. ``n > 0`` freezes after the ``n`` radiative-convective iterations ``NMAX_RC``.
 
 * **USE_EPACRIS_FORMAT**: Choose the format for cloud Mie scattering lookup tables. Set to ``0`` for LX-Mie format (as used in HELIOS) or ``1`` for EPACRIS format. EPACRIS format uses separate files (``Albedo.dat``, ``Cross.dat``, ``Geo.dat``) while LX-Mie uses radius-named files (``r0.010000.dat``, ``r0.012589.dat``, ``r0.015849.dat``, etc.).
 
-* **CLOUD_MIE_DIRECTORY_EPACRIS**: Base directory path for EPACRIS format Mie scattering tables. The directory structure should be ``<DIRECTORY>/<SPECIES_NAME>/`` (e.g., ``EPACRIS_MIE/H2O/``) containing ``Albedo.dat``, ``Cross.dat``, and ``Geo.dat`` files. See the :doc:`Code_structure` section for more details about the Mie table formatting.
+* **CLOUD_MIE_DIRECTORY_EPACRIS**: Base directory path for EPACRIS format Mie scattering tables. The directory structure should be ``<DIRECTORY>/<SPECIES_NAME>/`` (e.g., ``EPACRIS_MIE/H2O/``) containing ``Albedo.dat``, ``Cross.dat``, and ``Geo.dat`` files. See the :doc:`Code_structure` section (specifically :ref:`Code_structure:cloud_optics`) for more details about the Mie table formatting.
 
 * **CLOUD_MIE_DIRECTORY_LXMIE**: Base directory path for LX-Mie format Mie scattering tables. The directory structure should be ``<DIRECTORY>/<SPECIES_NAME>/`` (e.g., ``LXMieOuput/H2O/``) containing radius-keyed files like ``r0.010000.dat``, ``r0.012589.dat``, etc. The formatting of LX-Mie tables follows the formatting as explained in the `HELIOS documentation <https://heliosexo.readthedocs.io/en/latest/sections/tutorial.html#including-clouds>`_.
 
 * **CLOUD_SPECIES_LIST**: Comma-separated list of species IDs that cloud physics will be processed for. Species IDs are integer values defined in the species list file (e.g., ``Library/SpeciesList/species_HNCSO.dat``). Common values: ``7`` for H2O, ``9`` for NH3, ``20`` for CO, ``21`` for CH4, ``52`` for CO2. Only species with available Mie tables should be included. (Automatic detection implementation is currently being developed)
 
-* **CONDENSATION_MODE**: Method for determining which species can condense. Set to ``0`` for manual mode (use predefined ``CONDENSIBLES_MANUAL`` list), ``1`` for automatic mode (dynamic detection based on saturation ratios), or ``2`` for hybrid mode (manual list with automatic validation). Mode ``1`` is recommended for most cases.
+* **CONDENSATION_MODE**: Method for determining which species can condense. Set to ``0`` for manual mode (use predefined ``CONDENSIBLES_MANUAL`` list), ``1`` for automatic mode (dynamic detection based on saturation ratios), or ``2`` for hybrid mode (manual list with automatic validation). Mode ``1`` is recommended for most cases. See the :doc:`Code_structure` section (specifically :ref:`Code_structure:condensation_lapse_rate`) for details on condensation calculation.
 
 * **CONDENSATION_TIMING**: When to detect condensible species during the calculation. Set to ``0`` to detect once before the radiative-convective iteration, ``1`` to detect every radiative-convective iteration, or ``2`` to detect before the loop and then every ``NRT_RC`` iterations. Mode ``2`` provides a good balance between accuracy and computational efficiency.
 
@@ -98,7 +98,7 @@ Planet and stellar properties
 Initial concentration setting
 ------------------------------
 
-* **IMODE**: Method for setting initial atmospheric composition. Set to ``0`` for chemical equilibrium calculation (recommended), ``1`` to import from ``SPECIES_LIST`` file, ``2`` to import from previous calculation results, ``3`` for simplified chemical equilibrium formula. Mode ``0`` is the standard approach for self-consistent calculations.
+* **IMODE**: Method for setting initial atmospheric composition. Set to ``0`` for chemical equilibrium calculation (recommended), ``1`` to import from ``SPECIES_LIST`` file, ``2`` to import from previous calculation results, ``3`` for simplified chemical equilibrium formula. Mode ``0`` is the standard approach for self-consistent calculations. See the :doc:`Code_structure` section (specifically :ref:`Code_structure:initial_composition`) for details on how each mode works.
 
 * **IMODE_CHEM_FILE**: File containing concentrations of species, which is saved from a previous EPACRIS run (e.g., "Results/K2-18b/ConcentrationSTD_T.dat")
 
@@ -111,22 +111,22 @@ Initial concentration setting
 Radiative-convective solver settings
 -------------------------------------
 
-* **RadConv_Solver**: Choose the radiative-convective solver type. Set to ``0`` for Guillot TP profile (parameterized) or ``1`` for full radiative-convective climate solver (recommended). Mode ``1`` solves the full radiative transfer equations with convective adjustment.
+* **RadConv_Solver**: Choose the radiative-convective solver type. Set to ``0`` for Guillot TP profile (parameterized) or ``1`` for full radiative-convective climate solver (recommended). Mode ``1`` solves the full radiative transfer equations with convective adjustment. See the :doc:`Code_structure` section (specifically :ref:`Code_structure:climate_solver`) for details on the solver implementation.
 
 * **TIME_STEPPING**: Choose the method for solving radiative transfer flux equations. Set to ``0`` for matrix solver (faster but less stable) or ``1`` for time stepping (more stable, recommended). Time stepping iteratively approaches equilibrium and is more robust for difficult cases.
 
 * **TS_SCHEME**: Time stepping scheme for radiative transfer. Set to ``0`` for testing or ``1`` for HELIOS scheme (recommended). The HELIOS scheme uses a specific time-stepping approach optimized for atmospheric radiative transfer.
 
-* **TWO_STR_SOLVER**: Choose the two-stream radiative transfer solver. Set to ``0`` for Toon et al. (1989) delta-two-stream solver (by Renyu Hu) or ``1`` for Heng et al. (2018) two-stream solver with anisotropic scattering and non-isothermal layers (by Markus Scheucher, recommended). Mode ``1`` handles anisotropic scattering and temperature variations more accurately.
+* **TWO_STR_SOLVER**: Choose the two-stream radiative transfer solver. Set to ``0`` for Toon et al. (1989) delta-two-stream solver (by Renyu Hu) or ``1`` for Heng et al. (2018) two-stream solver with anisotropic scattering and non-isothermal layers (by Markus Scheucher, recommended). Mode ``1`` handles anisotropic scattering and temperature variations more accurately. See the :doc:`Code_structure` section (specifically :ref:`Code_structure:radiative_transfer_solver`) for implementation details.
 
 * **RT_FLUX_SOLVER**: Numerical method for solving the radiative transfer flux equations. Options: ``0`` = Thomas algorithm bottom-up, ``1`` = Thomas algorithm top-down, ``2`` = LU decomposition, ``3`` = Block-tridiagonal solver, ``4`` = PTRANS-I pentadiagonal solver (recommended), ``5`` = Sogabe 2008 pentadiagonal solver. Mode ``4`` is recommended for stability and efficiency with the pentadiagonal system from Heng+2018 solver.
 
 Iteration conditions
 --------------------
 
-* **NMAX**: Maximum number of climate-chemistry coupling iterations. Typically set to ``1`` since only one iteration is needed when opacity is updated during the radiative-convective loop. Higher values allow for chemistry-climate feedback, but this is rarely necessary.
+* **NMAX**: Maximum number of climate-chemistry coupling iterations. Typically set to ``1`` since only one iteration is needed when opacity is updated during the radiative-convective loop. Higher values allow for chemistry-climate feedback, but this is rarely necessary. See the :doc:`Code_structure` section (specifically :ref:`Code_structure:climate_chemistry_loop`) for details on the iteration process.
 
-* **NMAX_RC**: Maximum number of radiative-convective iterations. Each iteration performs radiative transfer calculations and convective adjustments until convergence. Increase this value if convergence is slow or if the model stops before reaching equilibrium. Typical values range from ``10`` to ``50``, with higher values for difficult cases.
+* **NMAX_RC**: Maximum number of radiative-convective iterations. Each iteration performs radiative transfer calculations and convective adjustments until convergence. Increase this value if convergence is slow or if the model stops before reaching equilibrium. Typical values range from ``10`` to ``50``, with higher values for difficult cases. See the :doc:`Code_structure` section (specifically :ref:`Code_structure:climate_solver`) for details on the radiative-convective iteration loop.
 
 * **NMAX_RT**: Maximum number of radiative transfer iterations per radiative-convective step. This controls how many RT steps are taken before checking for convective adjustment. Increase if RT convergence is slow. Typical values range from ``100`` to ``500``.
 

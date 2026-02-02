@@ -25,9 +25,9 @@
 #include "conv_cond_funcs.c"
 #include "plot_utils.c"
 
-// ============================================================================
+//--------------------------------------------------------------------- 
 // Function Implementations
-// ============================================================================
+//--------------------------------------------------------------------- 
 
 RTConvergenceStatus check_rt_convergence(double Rfluxmax, double dRfluxmax, 
                                        double Tint, double tol_rc, double tol_rc_r, double radiationO) {
@@ -85,7 +85,7 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
         // Following is run once to detect before loop if TIMING = 0
         detect_condensibles_atmosphere();
     }
-    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
     //double Rflux[zbin+1];
     double *Rflux;
@@ -102,7 +102,7 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
         }
     }
     
-    // Use global particle_number_density array for plotting (already populated by cloud_redistribution_none)
+    // Use global particle_number_density array for plotting (already populated by store_cloud_properties)
     // No need to allocate - use global array directly
     double Rfluxmax,dRfluxmax;
     int isconv[zbin+1], ncl=0, nrl=zbin; //convective layers setup
@@ -175,9 +175,9 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
     char live_plot_dir[1] = {0};
 #endif
 
-//*************************************************************
-// main iterative Rad-Conv loop:
-//*************************************************************
+//--------------------------------------------------------------------- 
+// *** Main iterative Rad-Conv loop ***
+//--------------------------------------------------------------------- 
     // For number of radiative-convective iterations (defined in config file)
     for (i=1; i<=NMAX_RC; i++) {
         
@@ -191,11 +191,10 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
             // Not resetting isconv to 0 causes the code to crash
         }
 
-        // Resets number of convective layers
-        ncl=0;
-        // Resets the number of radiative layers (all assumed radiative)
-        nrl=zbin;
+        ncl=0;        // Resets number of convective layers
+        nrl=zbin;        // Resets the number of radiative layers (all assumed radiative)
 
+        // Debug
         // Print total radiative and convective and isconv[j] layers
         // printf("Total radiative layers: %d\n", nrl);
         // printf("Total convective layers: %d\n", ncl);
@@ -205,30 +204,30 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
         // }
         // printf("\n");
 
-        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        //Radiative Transfer iteration
-        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        int pevery=20, pcount=0;//Added for printing every few steps
+        //---------------------------------------------------------------------  
+        // *** Radiative Transfer iteration ***
+        //--------------------------------------------------------------------- 
+        int pevery=20, pcount=0; //Added for printing every few steps
         double Tsaved[zbin+1];
-        int saveevery=20; //save Told every n steps for dt progression
+        int saveevery=20; // Save Told every n steps for dt progression
         int RTsteplimit;
 
         for (j=0;j<=nrl;j++) Rflux[j] = 0.0; 
         
-        RTstepcount=0; //initialized in main
+        RTstepcount=0; // Initialized in main
         if (i==1) RTsteplimit = NMAX_RT;
         if (i>1) RTsteplimit = NRT_RC;
 
-        for (j=0;j<=zbin;j++) Tsaved[j] = tempb[j]; //store T for dt progression
-        for (j=0;j<=zbin;j++) isequil[j] = 0; //store T for dt progression
+        for (j=0;j<=zbin;j++) Tsaved[j] = tempb[j]; // Store T for dt progression
+        for (j=0;j<=zbin;j++) isequil[j] = 0; // Store T for dt progression
 
-        // Write initial profile for live plot before radiative loop
+        // Stuff for live plot
         total_step_count++; // Increment for initial profile plot
         char initial_diag[512];
         sprintf(initial_diag, "RADIATIVE_DIAGNOSTICS: RTstep=%d Rfluxmax=%.3e dRfluxmax=%.3e equilib_layers=%d ncl=%d nrl=%d radiationI0=%.3e radiationI1=%.3e radiationO=%.3e", 
                 0, 0.0, 0.0, 0, ncl, nrl, 0.0, 0.0, 0.0);
                 
-        // Initialize saturation ratios to zero for initial profile
+        // Initialize saturation ratios to zero for initial plot
         for (int j=1; j<=zbin; j++) {
             tl[j] = 0.5 * (tempb[j]+tempb[j-1]);
             for (int k=0; k<NCONDENSIBLES; k++) {
@@ -236,7 +235,7 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
             }
         }
 
-#if LIVE_PLOTTING
+#if LIVE_PLOTTING    // Write initial profile for live plot
         write_live_plot_data(total_step_count, live_plot_dir, tempb, P, initial_diag, Tint, Tol_RC, Tol_RC_R, cp, lapse, isconv, saturation_ratios, pot_temp, nmax_iteration, particle_number_density);
 #endif
 
@@ -385,11 +384,9 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
             }
         }
 
-
-
-        //============================================================
-        //ms22: END of radiative transfer iteration
-        //============================================================
+        //--------------------------------------------------------------------- 
+        // *** End of radiative transfer iteration ***
+        //--------------------------------------------------------------------- 
 
         // This is if you dont want to do convective adjustment
         if(access(RTstopfile, F_OK )==0) printf("\n\n%s\n\n","===== RTstopfile found. RT loop aborted! =====");
@@ -422,7 +419,7 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
 
 
         //--------------------------------------------------------------------- 
-        // CONVECTION and CONDENSATION BEGINS HERE
+        // *** Convection and Condensation begins here ***
         //--------------------------------------------------------------------- 
 
         deltaconv = zbin; // Start with all layers convective
@@ -493,7 +490,7 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
             if (INCLUDE_CLOUD_PHYSICS == 0) {
                 // No cloud physics calculation
             } else if (INCLUDE_CLOUD_PHYSICS == 1) {
-                cloud_redistribution_none(P); // Calculate physics without redistribution
+                store_cloud_properties(P); // Calculate and store particle properties for cloud optics
                 // particle_number_density is populated globally, no copy needed
             } else if (INCLUDE_CLOUD_PHYSICS == 2) {
                 // exponential_cloud populates global particle_number_density array
@@ -509,6 +506,7 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
                 calculate_cloud_opacity_arrays();
             }
 
+            // Reset number of convective and radiative layers
             ncl = 0;
             nrl = 0;
 
@@ -610,10 +608,11 @@ void ms_Climate(double tempeq[], double P[], double T[], double Tint, char outne
             for (j=1; j<=zbin; j++) tl[j] = 0.5* (tempb[j]+tempb[j-1]);
             //printf("%s %d\n","deltaconv=",deltaconv);
 
+        } 
             
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        } // END of convective adjustment iteration
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        //--------------------------------------------------------------------- 
+        // END of convective adjustment iteration
+        //--------------------------------------------------------------------- 
         
         // APPLY RAINOUT BASED ON EVENT MODE
         // NOT TESTED!!!!
