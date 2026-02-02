@@ -60,7 +60,7 @@ limitations under the License.
 Reporting Issues
 ----------------
 
-For any issues and bugs please send an e-mail at `renyu.hu@jpl.nasa.gov <mailto:renyu.hu@jpl.nasa.gov>`_, or submit an issue through the Github system.
+For any issues and bugs please send an e-mail at `rqh5611@psu.edu <mailto:rqh5611@psu.edu>`_, or submit an issue through the Github system.
 
 
 .. toctree::
